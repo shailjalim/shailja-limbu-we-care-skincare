@@ -1,0 +1,19 @@
+# Pages Folder
+# 
+# This folder will contain page-level React components.
+# Pages represent different routes/views in the application.
+# 
+# Examples:
+# - Home.js / HomePage.jsx
+# - Login.js / LoginPage.jsx
+# - Register.js / RegisterPage.jsx
+# - Dashboard.js / DashboardPage.jsx
+# - Profile.js / ProfilePage.jsx
+# - NotFound.js / 404Page.jsx
+# 
+# Best Practices:
+# - One page per file
+# - Use React Router for navigation
+# - Pages compose smaller components
+# - Keep page logic minimal, delegate to components
+

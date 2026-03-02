@@ -1,0 +1,4 @@
+# This folder will contain Mongoose models
+# Example: User.js, Product.js, etc.
+# Models define the structure of documents in MongoDB collections
+

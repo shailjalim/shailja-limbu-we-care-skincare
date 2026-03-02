@@ -1,0 +1,4 @@
+# This folder will contain custom middleware
+# Example: authMiddleware.js for JWT authentication
+# Middleware functions have access to req, res, and next
+

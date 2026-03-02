@@ -1,0 +1,18 @@
+# Components Folder
+# 
+# This folder will contain reusable React components.
+# 
+# Examples:
+# - Header.js / Header.jsx
+# - Footer.js / Footer.jsx
+# - Button.js / Button.jsx
+# - Card.js / Card.jsx
+# - Navbar.js / Navbar.jsx
+# - Modal.js / Modal.jsx
+# 
+# Best Practices:
+# - One component per file
+# - Use PascalCase for component names
+# - Include component-specific CSS in same folder
+# - Create index.js for easier imports
+
