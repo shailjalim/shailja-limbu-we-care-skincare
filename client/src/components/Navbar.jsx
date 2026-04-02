@@ -46,6 +46,7 @@ const Navbar = () => {
     // Public navigation links (shown when logged out)
     const publicNavLinks = [
         { name: 'Home', path: '/' },
+        { name: 'Products', path: '/products' },
         { name: 'Features', path: '/features' },
         { name: 'Community', path: '/community' },
         { name: 'Contact', path: '/contact' },
@@ -54,7 +55,11 @@ const Navbar = () => {
     // Dashboard navigation links (shown when logged in)
     const dashboardNavLinks = [
         { name: 'Dashboard', path: '/dashboard' },
-        { name: 'Skin Quiz', path: '/quiz' },
+        { name: 'Products', path: '/products' },
+        { name: 'Routines', path: '/routines' },
+        { name: 'Subscription', path: '/subscription' },
+        { name: 'Consultation', path: '/consultation' },
+        ...(user?.role === 'admin' ? [{ name: 'Admin', path: '/admin' }] : []),
     ];
 
     // Use appropriate nav links based on auth state

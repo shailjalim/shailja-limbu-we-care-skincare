@@ -22,6 +22,12 @@ const testRoutes = require('./routes/testRoutes');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const productRoutes = require('./routes/productRoutes');
+const routineRoutes = require('./routes/routineRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const consultationRoutes = require('./routes/consultationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 // Initialize Express application
 const app = express();
@@ -79,6 +85,24 @@ app.use('/api/profile', profileRoutes);
  * Handles skin type quiz submission and calculation
  */
 app.use('/api/quiz', quizRoutes);
+
+/**
+ * Product Routes
+ * Base path: /api/products
+ * Handles product catalog CRUD and queries
+ */
+app.use('/api/products', productRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/routines', routineRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/consultations', consultationRoutes);
+
+/**
+ * Admin Routes
+ * Base path: /api/admin
+ * Handles admin dashboard and user management
+ */
+app.use('/api/admin', adminRoutes);
 
 /**
  * Test Routes
@@ -172,5 +196,9 @@ const startServer = async () => {
     }
 };
 
-// Call the startup function
-startServer();
+// Call the startup function when executed directly, but allow importing for tests
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;

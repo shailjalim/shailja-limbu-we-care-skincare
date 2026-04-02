@@ -13,6 +13,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react
 // Components
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -25,6 +26,12 @@ import Dashboard from './pages/Dashboard';
 import SkinQuiz from './pages/SkinQuiz';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ProductList from './pages/ProductList';
+import ProductDetail from './pages/ProductDetail';
+import RoutineTracker from './pages/RoutineTracker';
+import Subscription from './pages/Subscription';
+import Consultation from './pages/Consultation';
+import AdminDashboard from './pages/AdminDashboard';
 
 /**
  * Layout Component
@@ -131,6 +138,50 @@ function App() {
                         } 
                     />
                     
+                    {/* Product Catalog */}
+                    <Route path="/products" element={<ProductList />} />
+                    <Route path="/products/:id" element={<ProductDetail />} />
+
+                    {/* Skincare Routine Tracker */}
+                    <Route
+                        path="/routines"
+                        element={
+                            <PrivateRoute>
+                                <RoutineTracker />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* Subscription Page */}
+                    <Route
+                        path="/subscription"
+                        element={
+                            <PrivateRoute>
+                                <Subscription />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* Dermatologist Consultation */}
+                    <Route
+                        path="/consultation"
+                        element={
+                            <PrivateRoute>
+                                <Consultation />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* Admin Dashboard - Requires admin access */}
+                    <Route
+                        path="/admin"
+                        element={
+                            <AdminRoute>
+                                <AdminDashboard />
+                            </AdminRoute>
+                        }
+                    />
+
                     {/* ============ 404 NOT FOUND ============ */}
                     
                     <Route path="*" element={<NotFound />} />

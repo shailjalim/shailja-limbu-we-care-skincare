@@ -328,6 +328,214 @@ export const submitSkinQuiz = async (answers) => {
     }
 };
 
+// ================== PRODUCT CATALOG API ==================
+
+export const getProducts = async (params = {}) => {
+    try {
+        const response = await apiClient.get('/products', { params });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getProductById = async (productId) => {
+    try {
+        const response = await apiClient.get(`/products/${productId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getProductReviews = async (productId) => {
+    try {
+        const response = await apiClient.get(`/reviews/product/${productId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const submitProductReview = async (productId, reviewData) => {
+    try {
+        const response = await apiClient.post(`/reviews/product/${productId}`, reviewData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAllProducts = async () => {
+    try {
+        const response = await apiClient.get('/products');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// ================== ROUTINE TRACKER API ==================
+
+export const getRoutines = async () => {
+    try {
+        const response = await apiClient.get('/routines');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createRoutine = async (routineData) => {
+    try {
+        const response = await apiClient.post('/routines', routineData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateRoutine = async (routineId, routineData) => {
+    try {
+        const response = await apiClient.put(`/routines/${routineId}`, routineData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteRoutine = async (routineId) => {
+    try {
+        const response = await apiClient.delete(`/routines/${routineId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// ================== SUBSCRIPTION API ==================
+
+export const getCurrentSubscription = async () => {
+    try {
+        const response = await apiClient.get('/subscriptions/current');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const subscribeToPlan = async (plan, paymentMethod) => {
+    try {
+        const response = await apiClient.post('/subscriptions/subscribe', { plan, paymentMethod });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const cancelSubscription = async (subscriptionId) => {
+    try {
+        const response = await apiClient.put(`/subscriptions/${subscriptionId}/cancel`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// ================== CONSULTATION API ==================
+
+export const requestConsultation = async (consultationData) => {
+    try {
+        const response = await apiClient.post('/consultations', consultationData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getMyConsultations = async () => {
+    try {
+        const response = await apiClient.get('/consultations');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAllConsultations = async () => {
+    try {
+        const response = await apiClient.get('/consultations/admin/all');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const respondToConsultation = async (consultationId, responseText) => {
+    try {
+        const response = await apiClient.put(`/consultations/admin/${consultationId}/respond`, { response: responseText });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// ================== ADMIN API ==================
+
+export const getAdminStats = async () => {
+    try {
+        const response = await apiClient.get('/admin/stats');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getUsers = async () => {
+    try {
+        const response = await apiClient.get('/admin/users');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateUserRole = async (userId, role) => {
+    try {
+        const response = await apiClient.put(`/admin/users/${userId}/role`, { role });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteUser = async (userId) => {
+    try {
+        const response = await apiClient.delete(`/admin/users/${userId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createProduct = async (productData) => {
+    try {
+        const response = await apiClient.post('/products', productData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteProduct = async (productId) => {
+    try {
+        const response = await apiClient.delete(`/products/${productId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // ================== TEST API FUNCTIONS ==================
 
 /**

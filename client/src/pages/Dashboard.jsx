@@ -114,33 +114,14 @@ const Dashboard = () => {
         );
     }
 
-    // ============ NO PROFILE STATE ============
-    if (!profile) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
-                    <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span className="text-4xl">🧴</span>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-3">No Skin Profile Found</h2>
-                    <p className="text-gray-600 mb-6">
-                        Take our quick skin quiz to discover your skin type and get personalized recommendations.
-                    </p>
-                    <button 
-                        onClick={handleTakeQuiz}
-                        className="w-full px-6 py-3 bg-pink-600 text-white rounded-full font-medium hover:bg-pink-700 transition shadow-lg hover:shadow-xl"
-                    >
-                        Take Skin Quiz
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     // Get skin type configuration
-    const skinTypeConfig = SKIN_TYPE_CONFIG[profile.skinType] || SKIN_TYPE_CONFIG.normal;
+    const skinTypeConfig = profile ? SKIN_TYPE_CONFIG[profile.skinType] || SKIN_TYPE_CONFIG.normal : SKIN_TYPE_CONFIG.normal;
+    const quickActionTitle = profile ? 'Retake Quiz' : 'Take a quiz to know your skin';
+    const quickActionDescription = profile
+        ? 'Update your skin type whenever your skin changes.'
+        : 'New here? Start with a quick quiz to discover your skin type and personalized routine.';
 
-    // ============ DASHBOARD WITH PROFILE ============
+    // ============ DASHBOARD LAYOUT ============
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Top Header */}
@@ -174,164 +155,177 @@ const Dashboard = () => {
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-                {/* Dashboard Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    {/* Left Column - Skin Condition Card */}
+                    {/* Quick Actions */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-gray-800">Skin Condition</h2>
-                                <button className="text-gray-400 hover:text-gray-600">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            {/* Skin Type Badge */}
-                            <div className="text-center mb-6">
-                                <div className={`inline-flex items-center px-4 py-2 rounded-full ${skinTypeConfig.color} mb-4`}>
-                                    <span className="mr-2">{skinTypeConfig.icon}</span>
-                                    <span className="font-semibold">{skinTypeConfig.label} Skin</span>
-                                </div>
-                                <p className="text-gray-500 text-sm">Your skin is {profile.skinType}</p>
-                            </div>
-
-                            {/* Skin Stats */}
-                            <div className="grid grid-cols-3 gap-4 text-center border-t border-gray-100 pt-6">
-                                <div>
-                                    <p className="text-2xl font-bold text-gray-800">{profile.concerns?.length || 0}</p>
-                                    <p className="text-xs text-gray-500">Concerns</p>
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold text-gray-800">{profile.allergies?.length || 0}</p>
-                                    <p className="text-xs text-gray-500">Allergies</p>
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold text-gray-800">{profile.goals?.length || 0}</p>
-                                    <p className="text-xs text-gray-500">Goals</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Quick Actions */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6 mt-6">
                             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-                            <div className="space-y-3">
-                                <button 
-                                    onClick={handleTakeQuiz}
-                                    className="w-full flex items-center justify-between p-3 bg-pink-50 rounded-xl hover:bg-pink-100 transition"
-                                >
-                                    <div className="flex items-center">
-                                        <span className="text-xl mr-3">📋</span>
-                                        <span className="font-medium text-gray-800">Retake Quiz</span>
+                            <p className="text-sm text-gray-500 mb-6">{quickActionDescription}</p>
+                            <button 
+                                onClick={handleTakeQuiz}
+                                className="w-full flex items-center justify-between p-4 bg-pink-50 rounded-xl hover:bg-pink-100 transition"
+                            >
+                                <div className="flex items-center">
+                                    <span className="text-2xl mr-3">🧠</span>
+                                    <div className="text-left">
+                                        <p className="font-medium text-gray-800">{quickActionTitle}</p>
+                                        <p className="text-sm text-gray-500">{profile ? 'Retake the quiz for updated recommendations.' : 'Start the quiz now and learn your skin type.'}</p>
                                     </div>
-                                    <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                                <Link 
-                                    to="/features"
-                                    className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition"
-                                >
-                                    <div className="flex items-center">
-                                        <span className="text-xl mr-3">✨</span>
-                                        <span className="font-medium text-gray-800">Explore Features</span>
-                                    </div>
-                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </Link>
-                            </div>
+                                </div>
+                                <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
-                    {/* Middle & Right Columns */}
+                    {/* Main Dashboard Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        
-                        {/* Skin Concerns */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Skin Concerns</h2>
-                            {profile.concerns && profile.concerns.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {profile.concerns.map((concern, index) => (
-                                        <span 
-                                            key={index}
-                                            className="px-4 py-2 bg-pink-50 text-pink-700 rounded-full text-sm font-medium"
-                                        >
-                                            {concern}
-                                        </span>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 text-sm">No concerns added yet. Retake the quiz to update.</p>
-                            )}
-                        </div>
-
-                        {/* Allergies */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Known Allergies</h2>
-                            {profile.allergies && profile.allergies.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {profile.allergies.map((allergy, index) => (
-                                        <span 
-                                            key={index}
-                                            className="px-4 py-2 bg-red-50 text-red-700 rounded-full text-sm font-medium"
-                                        >
-                                            {allergy}
-                                        </span>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 text-sm">No allergies recorded. Update your profile to add.</p>
-                            )}
-                        </div>
-
-                        {/* Skincare Goals */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Your Skincare Goals</h2>
-                            {profile.goals && profile.goals.length > 0 ? (
-                                <div className="space-y-3">
-                                    {profile.goals.map((goal, index) => (
-                                        <div 
-                                            key={index}
-                                            className="flex items-center p-3 bg-green-50 rounded-xl"
-                                        >
-                                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </div>
-                                            <span className="font-medium text-gray-800">{goal}</span>
+                        {!profile ? (
+                            <div className="bg-white rounded-2xl shadow-sm p-8">
+                                <div className="flex flex-col items-center text-center gap-4">
+                                    <div className="w-24 h-24 bg-pink-100 rounded-full flex items-center justify-center">
+                                        <span className="text-4xl">✨</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Start Your Skin Journey</h2>
+                                        <p className="text-gray-500">
+                                            You haven’t completed the skin quiz yet. Once you do, we’ll finalize your skin type and personalize your routine.
+                                        </p>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                        <div className="p-4 bg-pink-50 rounded-2xl">
+                                            <h3 className="text-sm font-semibold text-gray-800 mb-2">Why take the quiz?</h3>
+                                            <p className="text-sm text-gray-600">Discover whether your skin is oily, dry, combination, sensitive, or normal.</p>
                                         </div>
-                                    ))}
+                                        <div className="p-4 bg-gray-50 rounded-2xl">
+                                            <h3 className="text-sm font-semibold text-gray-800 mb-2">What you get</h3>
+                                            <p className="text-sm text-gray-600">Personalized skincare advice, routines, and product recommendations.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            ) : (
-                                <p className="text-gray-500 text-sm">No goals set yet. Update your profile to add skincare goals.</p>
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Skin Condition Card */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-lg font-semibold text-gray-800">Skin Condition</h2>
+                                        <button className="text-gray-400 hover:text-gray-600">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
 
-                        {/* Skin Insights Card */}
-                        <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow-lg p-6 text-white">
-                            <h2 className="text-lg font-semibold mb-2">Personalized Tip</h2>
-                            <p className="opacity-90 text-sm mb-4">
-                                {profile.skinType === 'oily' && "Use oil-free moisturizers and clay masks weekly to control excess sebum."}
-                                {profile.skinType === 'dry' && "Hydrate with hyaluronic acid serums and avoid hot water when washing your face."}
-                                {profile.skinType === 'combination' && "Balance your routine with gentle cleansers and zone-specific treatments."}
-                                {profile.skinType === 'sensitive' && "Choose fragrance-free products and always patch test new skincare items."}
-                                {profile.skinType === 'normal' && "Maintain your healthy skin with consistent SPF and antioxidant serums."}
-                            </p>
-                            <Link 
-                                to="/features"
-                                className="inline-flex items-center text-sm font-medium hover:underline"
-                            >
-                                Learn more tips
-                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </Link>
-                        </div>
+                                    <div className="text-center mb-6">
+                                        <div className={`inline-flex items-center px-4 py-2 rounded-full ${skinTypeConfig.color} mb-4`}>
+                                            <span className="mr-2">{skinTypeConfig.icon}</span>
+                                            <span className="font-semibold">{skinTypeConfig.label} Skin</span>
+                                        </div>
+                                        <p className="text-gray-500 text-sm">Your skin is {profile.skinType}</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4 text-center border-t border-gray-100 pt-6">
+                                        <div>
+                                            <p className="text-2xl font-bold text-gray-800">{profile.concerns?.length || 0}</p>
+                                            <p className="text-xs text-gray-500">Concerns</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-2xl font-bold text-gray-800">{profile.allergies?.length || 0}</p>
+                                            <p className="text-xs text-gray-500">Allergies</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-2xl font-bold text-gray-800">{profile.goals?.length || 0}</p>
+                                            <p className="text-xs text-gray-500">Goals</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Skin Concerns */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Skin Concerns</h2>
+                                    {profile.concerns && profile.concerns.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {profile.concerns.map((concern, index) => (
+                                                <span 
+                                                    key={index}
+                                                    className="px-4 py-2 bg-pink-50 text-pink-700 rounded-full text-sm font-medium"
+                                                >
+                                                    {concern}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No concerns added yet. Retake the quiz to update.</p>
+                                    )}
+                                </div>
+
+                                {/* Allergies */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Known Allergies</h2>
+                                    {profile.allergies && profile.allergies.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {profile.allergies.map((allergy, index) => (
+                                                <span 
+                                                    key={index}
+                                                    className="px-4 py-2 bg-red-50 text-red-700 rounded-full text-sm font-medium"
+                                                >
+                                                    {allergy}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No allergies recorded. Update your profile to add.</p>
+                                    )}
+                                </div>
+
+                                {/* Skincare Goals */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Your Skincare Goals</h2>
+                                    {profile.goals && profile.goals.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {profile.goals.map((goal, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className="flex items-center p-3 bg-green-50 rounded-xl"
+                                                >
+                                                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
+                                                    <span className="font-medium text-gray-800">{goal}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No goals set yet. Update your profile to add skincare goals.</p>
+                                    )}
+                                </div>
+
+                                {/* Skin Insights Card */}
+                                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow-lg p-6 text-white">
+                                    <h2 className="text-lg font-semibold mb-2">Personalized Tip</h2>
+                                    <p className="opacity-90 text-sm mb-4">
+                                        {profile.skinType === 'oily' && "Use oil-free moisturizers and clay masks weekly to control excess sebum."}
+                                        {profile.skinType === 'dry' && "Hydrate with hyaluronic acid serums and avoid hot water when washing your face."}
+                                        {profile.skinType === 'combination' && "Balance your routine with gentle cleansers and zone-specific treatments."}
+                                        {profile.skinType === 'sensitive' && "Choose fragrance-free products and always patch test new skincare items."}
+                                        {profile.skinType === 'normal' && "Maintain your healthy skin with consistent SPF and antioxidant serums."}
+                                    </p>
+                                    <Link 
+                                        to="/features"
+                                        className="inline-flex items-center text-sm font-medium hover:underline"
+                                    >
+                                        Learn more tips
+                                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </Link>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </main>
@@ -340,3 +334,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
