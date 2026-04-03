@@ -14,8 +14,6 @@ const RoutineTracker = () => {
     const [routines, setRoutines] = useState([]);
     const [products, setProducts] = useState([]);
     const [productCategories, setProductCategories] = useState([]);
-    const [productSearch, setProductSearch] = useState('');
-    const [productCategory, setProductCategory] = useState('');
     const [routineType, setRoutineType] = useState('morning');
     const [selectedProducts, setSelectedProducts] = useState({});
     const [selectedRoutineId, setSelectedRoutineId] = useState(null);
@@ -40,10 +38,11 @@ const RoutineTracker = () => {
     const loadProducts = async () => {
         try {
             const response = await getAllProducts();
-            const allProducts = response.products || [];
+            const allProducts = Array.isArray(response) ? response : response.products || [];
             setProducts(allProducts);
             const categories = Array.from(new Set(allProducts.map((p) => p.category || 'General')));
             setProductCategories(categories);
+            console.log('Products loaded:', allProducts.length);
         } catch (err) {
             console.warn('Unable to load products', err);
         }
@@ -66,6 +65,7 @@ const RoutineTracker = () => {
         loadRoutines();
         loadProducts();
         loadProfileToSuggest();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -121,24 +121,54 @@ const RoutineTracker = () => {
         return recommendation[skinType] || [...baseSteps, 'Sunscreen'];
     };
 
+    const getBenefitsForSkinType = (skinType) => {
+        const benefitMap = {
+            oily: ['oil control', 'acne treatment', 'brightening'],
+            dry: ['hydration', 'soothing'],
+            combination: ['hydration', 'oil control'],
+            sensitive: ['soothing', 'hydration'],
+            normal: ['hydration', 'brightening'],
+        };
+        return benefitMap[skinType] || ['hydration', 'brightening'];
+    };
+
+    const getProductScore = (product, targetBenefits) => {
+        if (!product.benefits || !Array.isArray(product.benefits)) return 0;
+        // Count how many target benefits this product has
+        return product.benefits.filter((b) => targetBenefits.includes(b)).length;
+    };
+
     const applyRecommendedRoutine = () => {
         const skinType = userSkinType || 'normal';
-        const recommendedSteps = getRecommendedRoutine(skinType);
+        let recommendedSteps = getRecommendedRoutine(skinType);
+        const targetBenefits = getBenefitsForSkinType(skinType);
 
-        if (recommendedSteps.includes('Sunscreen') && routineType === 'night') {
-            setRoutineType('morning');
+        // For night routine, remove sunscreen
+        if (routineType === 'night') {
+            recommendedSteps = recommendedSteps.filter((step) => step !== 'Sunscreen');
         }
 
         const mapping = {};
         recommendedSteps.forEach((stepName) => {
-            const matchedProduct = products.find((p) => p.category?.toLowerCase().includes(stepName.toLowerCase()) || p.name?.toLowerCase().includes(stepName.toLowerCase()));
-            if (matchedProduct) {
-                mapping[stepName] = matchedProduct._id;
+            // Get all products in this category
+            const categoryProducts = products.filter((p) => p.category === stepName);
+            
+            if (categoryProducts.length === 0) return;
+
+            // Sort by benefit match score and pick the best one
+            const bestProduct = categoryProducts.reduce((best, current) => {
+                const currentScore = getProductScore(current, targetBenefits);
+                const bestScore = getProductScore(best, targetBenefits);
+                return currentScore > bestScore ? current : best;
+            });
+
+            if (bestProduct) {
+                mapping[stepName] = bestProduct._id;
             }
         });
 
         setSelectedProducts(mapping);
-        setMessage('Recommended routine loaded. Please adjust and save.');
+        setMessage(`Recommended routine loaded for ${skinType} skin type. Please adjust and save.`);
     };
 
     const handleSubmit = async (e) => {
@@ -212,15 +242,6 @@ const RoutineTracker = () => {
         return prod ? prod.name : 'Unknown Product';
     };
 
-    const filteredProducts = products.filter((product) => {
-        const matchesSearch = productSearch
-            ? product.name.toLowerCase().includes(productSearch.toLowerCase())
-              || product.category?.toLowerCase().includes(productSearch.toLowerCase())
-            : true;
-        const matchesCategory = productCategory ? product.category === productCategory : true;
-        return matchesSearch && matchesCategory;
-    });
-
     return (
         <div className="max-w-6xl mx-auto px-4 py-10">
             <div className="mb-8">
@@ -247,46 +268,28 @@ const RoutineTracker = () => {
                             </select>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <input
-                                type="text"
-                                value={productSearch}
-                                onChange={(e) => setProductSearch(e.target.value)}
-                                placeholder="Search products by name/category"
-                                className="rounded-3xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-200"
-                            />
-                            <select
-                                value={productCategory}
-                                onChange={(e) => setProductCategory(e.target.value)}
-                                className="rounded-3xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-200"
-                            >
-                                <option value="">All Categories</option>
-                                {productCategories.map((category) => (
-                                    <option key={category} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
                         <div className="space-y-4">
-                            {STEP_NAMES.filter((step) => !(routineType === 'night' && step === 'Sunscreen')).map((stepName) => (
-                                <div key={stepName}>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">{stepName}</label>
-                                    <select
-                                        value={selectedProducts[stepName] || ''}
-                                        onChange={(e) => handleSelectProduct(stepName, e.target.value)}
-                                        className="w-full rounded-3xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-200"
-                                    >
-                                        <option value="">Select product</option>
-                                        {filteredProducts.map((product) => (
-                                            <option key={product._id} value={product._id}>
-                                                {product.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
+                            {STEP_NAMES.filter((step) => !(routineType === 'night' && step === 'Sunscreen')).map((stepName) => {
+                                // Filter products by category matching the step
+                                const categoryProducts = products.filter((p) => p.category === stepName);
+                                return (
+                                    <div key={stepName}>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{stepName}</label>
+                                        <select
+                                            value={selectedProducts[stepName] || ''}
+                                            onChange={(e) => handleSelectProduct(stepName, e.target.value)}
+                                            className="w-full rounded-3xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-200"
+                                        >
+                                            <option value="">Select {stepName} product</option>
+                                            {categoryProducts.map((product) => (
+                                                <option key={product._id} value={product._id}>
+                                                    {product.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <div className="flex flex-col gap-2">
