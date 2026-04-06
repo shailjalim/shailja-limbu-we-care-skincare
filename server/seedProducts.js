@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const { connectDB } = require('./config/db');
 const Product = require('./models/Product');
+const { buildRecommendationFields } = require('./utils/productRecommendationFields');
+
+const withRecommendationFields = (product) => ({
+  ...product,
+  ...buildRecommendationFields(product, { preserveExisting: false }),
+});
 
 const products = [
   // Cleansers
@@ -269,8 +275,9 @@ const products = [
 const seedProducts = async () => {
   try {
     await connectDB();
+    const enrichedProducts = products.map(withRecommendationFields);
     await Product.deleteMany();
-    await Product.insertMany(products);
+    await Product.insertMany(enrichedProducts);
     console.log('Database seeded successfully with 32 products!');
   } catch (error) {
     console.error('Error seeding database:', error);

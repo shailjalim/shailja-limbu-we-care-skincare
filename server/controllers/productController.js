@@ -3,7 +3,7 @@ const Product = require('../models/Product');
 // Get all products with optional search/filter
 exports.getProducts = async (req, res) => {
   try {
-    const { search, ingredient, category } = req.query;
+    const { search, ingredient, category, skinType, concern } = req.query;
     let query = {};
 
     if (search) {
@@ -19,6 +19,14 @@ exports.getProducts = async (req, res) => {
 
     if (category) {
       query.category = { $regex: category, $options: 'i' };
+    }
+
+    if (skinType) {
+      query.skinTypes = { $in: [String(skinType).toLowerCase()] };
+    }
+
+    if (concern) {
+      query.concerns = { $in: [String(concern).toLowerCase()] };
     }
 
     const products = await Product.find(query);
