@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     getRoutines,
     createRoutine,
@@ -11,6 +12,7 @@ import {
 const STEP_NAMES = ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'Sunscreen'];
 
 const RoutineTracker = () => {
+    const location = useLocation();
     const [routines, setRoutines] = useState([]);
     const [products, setProducts] = useState([]);
     const [productCategories, setProductCategories] = useState([]);
@@ -21,6 +23,7 @@ const RoutineTracker = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [prefillApplied, setPrefillApplied] = useState(false);
 
     const loadRoutines = async () => {
         setLoading(true);
@@ -77,6 +80,41 @@ const RoutineTracker = () => {
             });
         }
     }, [routineType]);
+
+    useEffect(() => {
+        if (prefillApplied || products.length === 0) return;
+
+        const query = new URLSearchParams(location.search);
+        const queryProductId = query.get('productId');
+        const queryCategory = query.get('category');
+
+        const routeProductId = location.state?.preselectProductId;
+        const routeCategory = location.state?.preselectCategory;
+
+        const productId = routeProductId || queryProductId;
+        const category = routeCategory || queryCategory;
+
+        if (!productId || !category) return;
+
+        const matchedProduct = products.find((product) => String(product._id) === String(productId));
+        if (!matchedProduct) return;
+
+        const matchedStep = STEP_NAMES.find((step) => step.toLowerCase() === String(category).toLowerCase());
+        if (!matchedStep) {
+            setMessage(`Selected product "${matchedProduct.name}" does not match a routine step category.`);
+            setPrefillApplied(true);
+            return;
+        }
+
+        if (matchedStep === 'Sunscreen' && routineType === 'night') {
+            setRoutineType('morning');
+        }
+
+        setSelectedProducts((prev) => ({ ...prev, [matchedStep]: String(matchedProduct._id) }));
+        setMessage(`Added "${matchedProduct.name}" to ${matchedStep}. You can now complete and save the routine.`);
+        setError('');
+        setPrefillApplied(true);
+    }, [location.search, location.state, prefillApplied, products, routineType]);
 
     const handleSelectProduct = (stepName, value) => {
         setSelectedProducts((prev) => ({ ...prev, [stepName]: value }));

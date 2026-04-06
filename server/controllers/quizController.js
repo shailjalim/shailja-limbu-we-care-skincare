@@ -200,6 +200,7 @@ const submitQuiz = async (req, res) => {
                 concerns,
                 sensitivityLevel,
                 allergies,
+                lastQuizDate: new Date(),
             },
             { 
                 new: true,

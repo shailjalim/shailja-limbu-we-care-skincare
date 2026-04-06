@@ -385,7 +385,11 @@ const Dashboard = () => {
                                                     <div className="flex items-center justify-between">
                                                         <span className="text-lg font-bold text-pink-600">${product.price}</span>
                                                         <Link 
-                                                            to="/routines"
+                                                            to={`/routines?productId=${product._id}&category=${encodeURIComponent(product.category)}`}
+                                                            state={{
+                                                                preselectProductId: product._id,
+                                                                preselectCategory: product.category,
+                                                            }}
                                                             className="text-xs px-3 py-1 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition"
                                                         >
                                                             Use in Routine

@@ -10,6 +10,16 @@
 
 const mongoose = require('mongoose');
 
+const VALID_SKIN_TYPES = ['oily', 'dry', 'combination', 'normal', 'sensitive'];
+const VALID_SENSITIVITY_LEVELS = ['low', 'medium', 'high'];
+const VALID_SUN_EXPOSURE_LEVELS = ['low', 'medium', 'high'];
+const VALID_WATER_INTAKE_LEVELS = ['low', 'adequate', 'high'];
+
+const stringArrayValidator = {
+    validator: (value) => Array.isArray(value) && value.every((item) => typeof item === 'string'),
+    message: 'Value must be an array of strings',
+};
+
 /**
  * SkinProfile Schema Definition
  * 
@@ -34,38 +44,93 @@ const skinProfileSchema = new mongoose.Schema(
         skinType: {
             type: String,
             enum: {
-                values: ['oily', 'dry', 'combination', 'normal', 'sensitive'],
+                values: VALID_SKIN_TYPES,
                 message: 'Skin type must be one of: oily, dry, combination, normal, sensitive',
             },
             required: [true, 'Please select your skin type'],
+            lowercase: true,
+            trim: true,
         },
 
         // Array of skin concerns (optional, defaults to empty array)
         concerns: {
             type: [String],
             default: [],
+            validate: stringArrayValidator,
         },
 
         // Array of known allergies (optional, defaults to empty array)
         allergies: {
             type: [String],
             default: [],
+            validate: stringArrayValidator,
         },
 
         // Calculated sensitivity level from quiz score
         sensitivityLevel: {
             type: String,
             enum: {
-                values: ['low', 'medium', 'high'],
+                values: VALID_SENSITIVITY_LEVELS,
                 message: 'Sensitivity level must be one of: low, medium, high',
             },
             default: 'low',
+            lowercase: true,
+            trim: true,
+        },
+
+        // Lifestyle context for recommendation personalization
+        lifestyle: {
+            sunExposure: {
+                type: String,
+                enum: {
+                    values: VALID_SUN_EXPOSURE_LEVELS,
+                    message: 'Sun exposure must be one of: low, medium, high',
+                },
+                default: 'medium',
+                lowercase: true,
+                trim: true,
+            },
+            waterIntake: {
+                type: String,
+                enum: {
+                    values: VALID_WATER_INTAKE_LEVELS,
+                    message: 'Water intake must be one of: low, adequate, high',
+                },
+                default: 'adequate',
+                lowercase: true,
+                trim: true,
+            },
+        },
+
+        // Routine completion metrics for progress tracking
+        routineStats: {
+            totalCompleted: {
+                type: Number,
+                default: 0,
+                min: [0, 'totalCompleted cannot be negative'],
+            },
+            weeklyCompleted: {
+                type: Number,
+                default: 0,
+                min: [0, 'weeklyCompleted cannot be negative'],
+            },
+            lastCompletedDate: {
+                type: Date,
+                default: null,
+            },
+        },
+
+        // Most recent quiz completion date
+        lastQuizDate: {
+            type: Date,
+            default: Date.now,
         },
 
         // Array of skincare goals (optional, defaults to empty array)
         goals: {
             type: [String],
             default: [],
+            validate: stringArrayValidator,
         },
     },
     {

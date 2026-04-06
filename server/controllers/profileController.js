@@ -27,7 +27,15 @@ const createOrUpdateProfile = async (req, res) => {
         const userId = req.user._id;
 
         // Extract profile data from request body
-        const { skinType, concerns, allergies, goals, sensitivityLevel } = req.body;
+        const {
+            skinType,
+            concerns,
+            allergies,
+            goals,
+            sensitivityLevel,
+            lifestyle,
+            routineStats,
+        } = req.body;
 
         // ============ VALIDATION ============
 
@@ -56,6 +64,61 @@ const createOrUpdateProfile = async (req, res) => {
             });
         }
 
+        if (concerns !== undefined && !Array.isArray(concerns)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Concerns must be an array of strings',
+            });
+        }
+
+        if (allergies !== undefined && !Array.isArray(allergies)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Allergies must be an array of strings',
+            });
+        }
+
+        if (goals !== undefined && !Array.isArray(goals)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Goals must be an array of strings',
+            });
+        }
+
+        const validSunExposure = ['low', 'medium', 'high'];
+        const validWaterIntake = ['low', 'adequate', 'high'];
+
+        if (lifestyle?.sunExposure && !validSunExposure.includes(String(lifestyle.sunExposure).toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid sunExposure. Must be one of: ${validSunExposure.join(', ')}`,
+            });
+        }
+
+        if (lifestyle?.waterIntake && !validWaterIntake.includes(String(lifestyle.waterIntake).toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid waterIntake. Must be one of: ${validWaterIntake.join(', ')}`,
+            });
+        }
+
+        if (routineStats) {
+            const { totalCompleted, weeklyCompleted } = routineStats;
+            if (totalCompleted !== undefined && (typeof totalCompleted !== 'number' || totalCompleted < 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'routineStats.totalCompleted must be a non-negative number',
+                });
+            }
+
+            if (weeklyCompleted !== undefined && (typeof weeklyCompleted !== 'number' || weeklyCompleted < 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'routineStats.weeklyCompleted must be a non-negative number',
+                });
+            }
+        }
+
         // ============ BUILD PROFILE DATA ============
 
         const profileData = {
@@ -65,6 +128,11 @@ const createOrUpdateProfile = async (req, res) => {
             allergies: allergies || [],
             goals: goals || [],
             sensitivityLevel: sensitivityLevel ? String(sensitivityLevel).toLowerCase() : undefined,
+            lifestyle: {
+                sunExposure: lifestyle?.sunExposure ? String(lifestyle.sunExposure).toLowerCase() : undefined,
+                waterIntake: lifestyle?.waterIntake ? String(lifestyle.waterIntake).toLowerCase() : undefined,
+            },
+            routineStats,
         };
 
         // ============ CHECK FOR EXISTING PROFILE ============
@@ -82,6 +150,8 @@ const createOrUpdateProfile = async (req, res) => {
                     allergies: profileData.allergies,
                     goals: profileData.goals,
                     sensitivityLevel: profileData.sensitivityLevel,
+                    lifestyle: profileData.lifestyle,
+                    routineStats: profileData.routineStats,
                 },
                 { 
                     new: true, // Return the updated document
