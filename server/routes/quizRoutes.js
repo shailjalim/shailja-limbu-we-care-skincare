@@ -24,21 +24,17 @@ const { submitQuiz } = require('../controllers/quizController');
 
 /**
  * @route   POST /api/quiz
- * @desc    Submit skin quiz answers and calculate skin type
+ * @desc    Submit skin quiz answers and calculate profile insights
  * @access  Private
  * 
  * @body    {Object} answers - Quiz answers object containing:
- *          - oilyAfterWash: "yes" | "no"
- *          - tightAfterWash: "yes" | "no"
- *          - frequentAcne: "yes" | "no"
- *          - rednessIrritation: "yes" | "no"
- *          - shinyTZone: "yes" | "no"
+ *          - Each question ID mapped to selected option ID
  * 
  * @returns {Object} Response containing:
  *          - success: boolean
  *          - message: string
- *          - skinType: calculated skin type
- *          - scores: breakdown of scores per skin type
+ *          - result: { skinType, concerns, sensitivityLevel, allergies }
+ *          - scores: breakdown of oily/dry/sensitive/acne scores
  *          - profile: updated/created skin profile
  */
 router.post('/', protect, submitQuiz);

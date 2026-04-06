@@ -52,6 +52,16 @@ const skinProfileSchema = new mongoose.Schema(
             default: [],
         },
 
+        // Calculated sensitivity level from quiz score
+        sensitivityLevel: {
+            type: String,
+            enum: {
+                values: ['low', 'medium', 'high'],
+                message: 'Sensitivity level must be one of: low, medium, high',
+            },
+            default: 'low',
+        },
+
         // Array of skincare goals (optional, defaults to empty array)
         goals: {
             type: [String],

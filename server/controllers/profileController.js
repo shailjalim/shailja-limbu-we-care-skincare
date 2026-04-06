@@ -27,7 +27,7 @@ const createOrUpdateProfile = async (req, res) => {
         const userId = req.user._id;
 
         // Extract profile data from request body
-        const { skinType, concerns, allergies, goals } = req.body;
+        const { skinType, concerns, allergies, goals, sensitivityLevel } = req.body;
 
         // ============ VALIDATION ============
 
@@ -48,6 +48,14 @@ const createOrUpdateProfile = async (req, res) => {
             });
         }
 
+        const validSensitivityLevels = ['low', 'medium', 'high'];
+        if (sensitivityLevel && !validSensitivityLevels.includes(String(sensitivityLevel).toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid sensitivity level. Must be one of: ${validSensitivityLevels.join(', ')}`,
+            });
+        }
+
         // ============ BUILD PROFILE DATA ============
 
         const profileData = {
@@ -56,6 +64,7 @@ const createOrUpdateProfile = async (req, res) => {
             concerns: concerns || [],
             allergies: allergies || [],
             goals: goals || [],
+            sensitivityLevel: sensitivityLevel ? String(sensitivityLevel).toLowerCase() : undefined,
         };
 
         // ============ CHECK FOR EXISTING PROFILE ============
@@ -72,6 +81,7 @@ const createOrUpdateProfile = async (req, res) => {
                     concerns: profileData.concerns,
                     allergies: profileData.allergies,
                     goals: profileData.goals,
+                    sensitivityLevel: profileData.sensitivityLevel,
                 },
                 { 
                     new: true, // Return the updated document
