@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react
 
 // Components
 import Navbar from './components/Navbar';
+import ChatbotWidget from './components/ChatbotWidget';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 
@@ -29,6 +30,7 @@ import ResetPassword from './pages/ResetPassword';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import RoutineTracker from './pages/RoutineTracker';
+import Chatbot from './pages/Chatbot';
 import Subscription from './pages/Subscription';
 import Consultation from './pages/Consultation';
 import AdminDashboard from './pages/AdminDashboard';
@@ -53,6 +55,7 @@ const Layout = ({ children }) => {
         <div className="min-h-screen bg-white">
             {/* Navigation Bar - Hidden on auth pages */}
             {!shouldHideNavbar && <Navbar />}
+            {!shouldHideNavbar && <ChatbotWidget />}
             
             {/* Main Content */}
             {children}
@@ -168,6 +171,16 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Consultation />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* AI Chatbot - Requires Authentication */}
+                    <Route
+                        path="/chatbot"
+                        element={
+                            <PrivateRoute>
+                                <Chatbot />
                             </PrivateRoute>
                         }
                     />

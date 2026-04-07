@@ -28,6 +28,7 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const consultationRoutes = require('./routes/consultationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 
 // Initialize Express application
 const app = express();
@@ -96,6 +97,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/routines', routineRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/consultations', consultationRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 /**
  * Admin Routes

@@ -526,6 +526,35 @@ export const respondToConsultation = async (consultationId, responseText) => {
     }
 };
 
+// ================== CHATBOT API ==================
+
+export const sendChatbotMessage = async (message, history = []) => {
+    try {
+        const response = await apiClient.post('/chatbot', { message, history });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getChatHistory = async () => {
+    try {
+        const response = await apiClient.get('/chatbot');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const clearChatHistory = async () => {
+    try {
+        const response = await apiClient.delete('/chatbot');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // ================== ADMIN API ==================
 
 export const getAdminStats = async () => {

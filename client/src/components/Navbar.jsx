@@ -56,6 +56,7 @@ const Navbar = () => {
     const dashboardNavLinks = [
         { name: 'Dashboard', path: '/dashboard' },
         { name: 'Products', path: '/products' },
+        { name: 'Chatbot', path: '/chatbot' },
         { name: 'Routines', path: '/routines' },
         { name: 'Subscription', path: '/subscription' },
         { name: 'Consultation', path: '/consultation' },
