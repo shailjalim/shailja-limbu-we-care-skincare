@@ -631,6 +631,134 @@ export const deleteProduct = async (productId) => {
     }
 };
 
+// ================== ADMIN MANAGEMENT API ==================
+
+export const getAdminProducts = async () => {
+    try {
+        const response = await apiClient.get('/admin/products');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createAdminProduct = async (productData) => {
+    try {
+        const response = await apiClient.post('/admin/products', productData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAdminProduct = async (productId, productData) => {
+    try {
+        const response = await apiClient.put(`/admin/products/${productId}`, productData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteAdminProduct = async (productId) => {
+    try {
+        const response = await apiClient.delete(`/admin/products/${productId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAdminUsers = async () => {
+    try {
+        const response = await apiClient.get('/admin/users');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAdminUserRole = async (userId, role) => {
+    try {
+        const response = await apiClient.put(`/admin/users/${userId}/role`, { role });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteAdminUser = async (userId) => {
+    try {
+        const response = await apiClient.delete(`/admin/users/${userId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAdminArticles = async () => {
+    try {
+        const response = await apiClient.get('/admin/articles');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createAdminArticle = async (articleData) => {
+    try {
+        const response = await apiClient.post('/admin/articles', articleData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAdminArticle = async (articleId, articleData) => {
+    try {
+        const response = await apiClient.put(`/admin/articles/${articleId}`, articleData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteAdminArticle = async (articleId) => {
+    try {
+        const response = await apiClient.delete(`/admin/articles/${articleId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAdminConsultations = async () => {
+    try {
+        const response = await apiClient.get('/admin/consultations');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAdminConsultation = async (consultationId, payload) => {
+    try {
+        const response = await apiClient.put(`/admin/consultations/${consultationId}`, payload);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteAdminConsultation = async (consultationId) => {
+    try {
+        const response = await apiClient.delete(`/admin/consultations/${consultationId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // ================== TEST API FUNCTIONS ==================
 
 /**

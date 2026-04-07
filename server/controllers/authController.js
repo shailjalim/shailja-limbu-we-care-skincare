@@ -17,11 +17,11 @@ const { sendEmail, generateResetPasswordEmail } = require('../utils/sendEmail');
  * 
  * Creates a signed JWT token for user authentication.
  * 
- * @param {string} id - User's MongoDB ObjectId
+ * @param {Object} user - User document/object with id and role
  * @returns {string} - Signed JWT token
  */
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (user) => {
+    return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
         expiresIn: '7d',
     });
 };
@@ -58,7 +58,8 @@ const formatUserResponse = (user, token) => {
  */
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
+        const requestedRole = role === 'admin' ? 'admin' : 'user';
 
         // ============ VALIDATION ============
 
@@ -98,17 +99,28 @@ const registerUser = async (req, res) => {
             });
         }
 
+        if (requestedRole === 'admin') {
+            const adminCount = await User.countDocuments({ role: 'admin' });
+            if (adminCount > 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Only one admin account is allowed',
+                });
+            }
+        }
+
         // ============ CREATE USER ============
 
         const user = await User.create({
             name: name.trim(),
             email: email.toLowerCase().trim(),
             password,
+            role: requestedRole,
         });
 
         // ============ GENERATE TOKEN & RESPOND ============
 
-        const token = generateToken(user._id);
+        const token = generateToken(user);
 
         res.status(201).json({
             success: true,
@@ -192,7 +204,7 @@ const loginUser = async (req, res) => {
 
         // ============ GENERATE TOKEN & RESPOND ============
 
-        const token = generateToken(user._id);
+        const token = generateToken(user);
 
         res.status(200).json({
             success: true,
@@ -408,7 +420,7 @@ const resetPassword = async (req, res) => {
 
         // ============ GENERATE NEW AUTH TOKEN ============
 
-        const authToken = generateToken(user._id);
+        const authToken = generateToken(user);
 
         res.status(200).json({
             success: true,

@@ -15,6 +15,7 @@ import Navbar from './components/Navbar';
 import ChatbotWidget from './components/ChatbotWidget';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
+import AdminLayout from './components/admin/AdminLayout';
 
 // Pages
 import Home from './pages/Home';
@@ -36,6 +37,10 @@ import Chatbot from './pages/Chatbot';
 import Subscription from './pages/Subscription';
 import Consultation from './pages/Consultation';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from './pages/AdminProducts';
+import AdminUsers from './pages/AdminUsers';
+import AdminArticles from './pages/AdminArticles';
+import AdminConsultations from './pages/AdminConsultations';
 
 /**
  * Layout Component
@@ -196,10 +201,16 @@ function App() {
                         path="/admin"
                         element={
                             <AdminRoute>
-                                <AdminDashboard />
+                                <AdminLayout />
                             </AdminRoute>
                         }
-                    />
+                    >
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="products" element={<AdminProducts />} />
+                        <Route path="users" element={<AdminUsers />} />
+                        <Route path="articles" element={<AdminArticles />} />
+                        <Route path="consultations" element={<AdminConsultations />} />
+                    </Route>
 
                     {/* ============ 404 NOT FOUND ============ */}
                     

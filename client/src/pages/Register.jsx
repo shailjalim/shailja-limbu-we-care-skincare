@@ -21,6 +21,7 @@ const Register = () => {
         email: '',
         password: '',
         confirmPassword: '',
+        role: 'user',
     });
 
     // UI state
@@ -84,6 +85,7 @@ const Register = () => {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
+                role: formData.role,
             });
 
             if (response.success) {
@@ -272,6 +274,29 @@ const Register = () => {
                         </div>
 
                         {/* Terms Agreement */}
+                        <div className="rounded-xl border border-pink-100 bg-pink-50 p-3">
+                            <div className="flex items-start">
+                                <input
+                                    type="checkbox"
+                                    id="adminRole"
+                                    checked={formData.role === 'admin'}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            role: e.target.checked ? 'admin' : 'user',
+                                        })
+                                    }
+                                    className="w-4 h-4 mt-1 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                                />
+                                <label htmlFor="adminRole" className="ml-2 text-sm text-gray-700">
+                                    Register as admin (first account only)
+                                </label>
+                            </div>
+                            <p className="mt-2 text-xs text-gray-500">
+                                Only one admin account is allowed. If an admin already exists, admin registration will be rejected.
+                            </p>
+                        </div>
+
                         <div className="flex items-start">
                             <input 
                                 type="checkbox" 

@@ -30,6 +30,10 @@ const adminRoutes = require('./routes/adminRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const contentRoutes = require('./routes/contentRoutes');
+const adminProductRoutes = require('./routes/adminProductRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
+const adminArticleRoutes = require('./routes/adminArticleRoutes');
+const adminConsultationRoutes = require('./routes/adminConsultationRoutes');
 
 // Initialize Express application
 const app = express();
@@ -107,6 +111,10 @@ app.use('/api/content', contentRoutes);
  * Handles admin dashboard and user management
  */
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/articles', adminArticleRoutes);
+app.use('/api/admin/consultations', adminConsultationRoutes);
 
 /**
  * Test Routes

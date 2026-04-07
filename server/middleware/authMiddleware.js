@@ -119,9 +119,15 @@ const authorize = (...roles) => {
     };
 };
 
+// Aliases for clearer role-based middleware naming
+const verifyToken = protect;
+const adminOnly = authorize('admin');
+
 module.exports = {
     protect,
     authorize,
+    verifyToken,
+    adminOnly,
 };
 
 
