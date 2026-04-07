@@ -29,6 +29,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
+import ContentList from './pages/ContentList';
+import ContentDetail from './pages/ContentDetail';
 import RoutineTracker from './pages/RoutineTracker';
 import Chatbot from './pages/Chatbot';
 import Subscription from './pages/Subscription';
@@ -144,6 +146,10 @@ function App() {
                     {/* Product Catalog */}
                     <Route path="/products" element={<ProductList />} />
                     <Route path="/products/:id" element={<ProductDetail />} />
+
+                    {/* Educational Content */}
+                    <Route path="/content" element={<ContentList />} />
+                    <Route path="/content/:id" element={<ContentDetail />} />
 
                     {/* Skincare Routine Tracker */}
                     <Route

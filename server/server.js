@@ -29,6 +29,7 @@ const consultationRoutes = require('./routes/consultationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
+const contentRoutes = require('./routes/contentRoutes');
 
 // Initialize Express application
 const app = express();
@@ -98,6 +99,7 @@ app.use('/api/routines', routineRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/content', contentRoutes);
 
 /**
  * Admin Routes
@@ -138,6 +140,7 @@ app.get('/', (req, res) => {
             quiz: {
                 submit: 'POST /api/quiz',
             },
+            content: '/api/content',
             test: '/api/test',
             health: '/api/health',
         },

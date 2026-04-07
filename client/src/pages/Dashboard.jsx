@@ -12,7 +12,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getSkinProfile, getUser, getAllProducts, getRoutines } from '../services/api';
+import { getSkinProfile, getUser, getAllProducts, getContent, getRoutines } from '../services/api';
+import { getRecommendedContent } from '../utils/contentRecommendation';
 
 /**
  * Skin type display configuration
@@ -79,7 +80,7 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
-    const [allProducts, setAllProducts] = useState([]);
+    const [recommendedContent, setRecommendedContent] = useState([]);
     const [routines, setRoutines] = useState([]);
 
     const navigate = useNavigate();
@@ -107,7 +108,6 @@ const Dashboard = () => {
                     try {
                         const productsResponse = await getAllProducts();
                         const productsData = Array.isArray(productsResponse) ? productsResponse : productsResponse.products || [];
-                        setAllProducts(productsData);
 
                         // Generate recommended products based on skin type
                         const recommended = getRecommendedProductsForSkin(
@@ -119,6 +119,20 @@ const Dashboard = () => {
                         setRecommendedProducts(recommended);
                     } catch (prodErr) {
                         console.warn('Failed to load products:', prodErr);
+                    }
+
+                    try {
+                        const contentResponse = await getContent();
+                        const contentData = Array.isArray(contentResponse) ? contentResponse : [];
+
+                        const recommendedArticles = getRecommendedContent(
+                            profileResponse.profile,
+                            contentData,
+                            { limit: 5 }
+                        );
+                        setRecommendedContent(recommendedArticles);
+                    } catch (contentErr) {
+                        console.warn('Failed to load content:', contentErr);
                     }
 
                     // Fetch user routines for activity tracking
@@ -233,6 +247,19 @@ const Dashboard = () => {
                                         <span className="font-medium text-gray-800 text-sm">View Products</span>
                                     </div>
                                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </Link>
+
+                                <Link 
+                                    to="/content"
+                                    className="w-full flex items-center justify-between p-3 bg-rose-50 rounded-xl hover:bg-rose-100 transition"
+                                >
+                                    <div className="flex items-center">
+                                        <span className="text-xl mr-2">📚</span>
+                                        <span className="font-medium text-gray-800 text-sm">Learn Content</span>
+                                    </div>
+                                    <svg className="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                 </Link>
@@ -400,6 +427,45 @@ const Dashboard = () => {
                                         </div>
                                     ) : (
                                         <p className="text-gray-500 text-sm">No recommendations available. Update your profile for better suggestions.</p>
+                                    )}
+                                </div>
+
+                                {/* Recommended Content */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6">
+                                    <div className="flex items-center justify-between gap-4 mb-4">
+                                        <div>
+                                            <h2 className="text-lg font-semibold text-gray-800">Recommended for You</h2>
+                                            <p className="text-sm text-gray-500">Educational articles matched to your concerns and skin type.</p>
+                                        </div>
+                                        <Link to="/content" className="text-sm font-medium text-pink-600 hover:text-pink-700">
+                                            View all
+                                        </Link>
+                                    </div>
+                                    {recommendedContent.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {recommendedContent.slice(0, 4).map((article) => (
+                                                <div key={article._id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition">
+                                                    <div className="flex items-center justify-between gap-3 mb-3">
+                                                        <span className="inline-block px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-full font-medium">
+                                                            {article.category}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400">{article.tags?.slice(0, 2).join(' • ')}</span>
+                                                    </div>
+                                                    <h3 className="font-semibold text-gray-800 text-sm mb-2">{article.title}</h3>
+                                                    <p className="text-gray-600 text-xs mb-3 line-clamp-3">
+                                                        {article.content.length > 140 ? `${article.content.slice(0, 140).trim()}...` : article.content}
+                                                    </p>
+                                                    <Link
+                                                        to={`/content/${article._id}`}
+                                                        className="text-xs px-3 py-1 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition inline-block"
+                                                    >
+                                                        Read More
+                                                    </Link>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No recommended articles yet. Browse the content library to explore skincare guides.</p>
                                     )}
                                 </div>
 

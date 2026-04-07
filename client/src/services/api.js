@@ -348,6 +348,26 @@ export const getProductById = async (productId) => {
     }
 };
 
+// ================== CONTENT API ==================
+
+export const getContent = async (params = {}) => {
+    try {
+        const response = await apiClient.get('/content', { params });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getContentById = async (contentId) => {
+    try {
+        const response = await apiClient.get(`/content/${contentId}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getProductReviews = async (productId) => {
     try {
         const response = await apiClient.get(`/reviews/product/${productId}`);

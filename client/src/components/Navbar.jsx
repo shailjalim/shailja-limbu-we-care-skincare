@@ -47,6 +47,7 @@ const Navbar = () => {
     const publicNavLinks = [
         { name: 'Home', path: '/' },
         { name: 'Products', path: '/products' },
+        { name: 'Content', path: '/content' },
         { name: 'Features', path: '/features' },
         { name: 'Community', path: '/community' },
         { name: 'Contact', path: '/contact' },
@@ -56,6 +57,7 @@ const Navbar = () => {
     const dashboardNavLinks = [
         { name: 'Dashboard', path: '/dashboard' },
         { name: 'Products', path: '/products' },
+        { name: 'Content', path: '/content' },
         { name: 'Chatbot', path: '/chatbot' },
         { name: 'Routines', path: '/routines' },
         { name: 'Subscription', path: '/subscription' },

@@ -139,12 +139,6 @@ const skinProfileSchema = new mongoose.Schema(
 );
 
 /**
- * Index for faster queries by user
- * The unique constraint on 'user' field also creates an index
- */
-skinProfileSchema.index({ user: 1 });
-
-/**
  * Transform Output
  * 
  * Removes internal fields when converting to JSON for API responses.

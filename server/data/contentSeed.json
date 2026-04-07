@@ -1,0 +1,50 @@
+[
+  {
+    "title": "How to Treat Acne Naturally",
+    "category": "acne",
+    "content": "Acne care starts with a gentle routine and consistency. Wash your face twice daily with a mild cleanser, avoid harsh scrubs, and use non-comedogenic products. Ingredients like salicylic acid and niacinamide can help reduce breakouts, while sunscreen prevents dark marks from becoming worse. Do not pick at pimples because it can increase inflammation and scarring. If acne is severe or painful, consider speaking with a dermatologist for personalized treatment.",
+    "tags": ["acne", "breakouts", "salicylic acid", "oil control"]
+  },
+  {
+    "title": "Best Routine for Dry Skin",
+    "category": "dryness",
+    "content": "Dry skin needs moisture, barrier support, and gentle cleansing. Use a hydrating cleanser, apply a serum with hyaluronic acid, and follow with a rich moisturizer while your skin is still damp. Avoid hot water and over-exfoliating, since both can strip natural oils. If your environment is dry, consider using a humidifier at night. Daily sunscreen is still important because dry skin can become irritated more easily from sun exposure.",
+    "tags": ["dry skin", "hydration", "moisturizer", "barrier repair"]
+  },
+  {
+    "title": "Oily Skin Care Tips That Actually Work",
+    "category": "oily",
+    "content": "Oily skin benefits from lightweight products and oil-balancing ingredients. Choose a foaming or gel cleanser, use a non-greasy moisturizer, and look for niacinamide or salicylic acid if you struggle with clogged pores. Skipping moisturizer can make skin overproduce oil, so hydration still matters. Blotting papers can help during the day, but they should not replace a proper skincare routine.",
+    "tags": ["oily skin", "oil control", "niacinamide", "acne"]
+  },
+  {
+    "title": "Sensitive Skin Do’s and Don’ts",
+    "category": "sensitive",
+    "content": "Sensitive skin responds best to simple routines and fragrance-free products. Patch test anything new before applying it to your whole face. Avoid strong exfoliants, alcohol-heavy formulas, and too many active ingredients at once. Look for calming ingredients such as aloe vera, panthenol, ceramides, and chamomile. If your skin burns, stings, or stays red for a long time, simplify your routine and review your triggers.",
+    "tags": ["sensitive skin", "fragrance-free", "soothing", "ceramides"]
+  },
+  {
+    "title": "A Simple Skincare Routine for Beginners",
+    "category": "general",
+    "content": "A basic routine does not need many products. Start with cleansing, moisturizing, and sunscreen in the morning. At night, cleanse again and moisturize. Once your skin feels stable, you can introduce one active ingredient at a time based on your concerns. A simple routine is often easier to maintain and can produce better long-term results than a complicated one.",
+    "tags": ["beginner", "routine", "sunscreen", "moisturizer"]
+  },
+  {
+    "title": "How to Build a Morning Routine",
+    "category": "general",
+    "content": "A morning routine should protect skin from pollution and UV damage. Cleanse lightly if needed, apply a serum that matches your concern, use moisturizer, and finish with broad-spectrum sunscreen. If you have oily skin, choose lightweight textures. If you have dry skin, use richer layers. The goal is protection without irritation.",
+    "tags": ["morning routine", "sunscreen", "protection", "hydration"]
+  },
+  {
+    "title": "Nighttime Recovery for Skin",
+    "category": "general",
+    "content": "Night is the best time for repair-focused skincare. After cleansing, use treatment products sparingly and follow with a moisturizer that supports the skin barrier. Ingredients like retinol, peptides, and ceramides can be useful depending on your skin needs. Keep the routine calm and consistent so your skin can recover overnight.",
+    "tags": ["night routine", "repair", "ceramides", "retinol"]
+  },
+  {
+    "title": "Understanding Common Acne Triggers",
+    "category": "acne",
+    "content": "Acne triggers can include excess oil, clogged pores, hormonal changes, and irritation from harsh products. Sweat and touching your face often can also worsen breakouts. Focus on gentle cleansing, non-comedogenic moisturizer, and acne-safe actives if needed. Tracking your breakouts can help identify patterns and improve your routine.",
+    "tags": ["acne", "triggers", "breakouts", "non-comedogenic"]
+  }
+]
