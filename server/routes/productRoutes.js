@@ -7,6 +7,9 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);
 
+// Protected routes
+router.get('/recommendations/personalized', protect, productController.getRecommendedProducts);
+
 // Admin routes
 router.post('/', protect, authorize('admin'), productController.createProduct);
 router.put('/:id', protect, authorize('admin'), productController.updateProduct);

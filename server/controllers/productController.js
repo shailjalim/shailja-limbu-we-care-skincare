@@ -1,4 +1,9 @@
 const Product = require('../models/Product');
+const SkinProfile = require('../models/SkinProfile');
+const {
+  getRecommendedProducts,
+  getDetailedRecommendations,
+} = require('../utils/productRecommendation');
 
 // Get all products with optional search/filter
 exports.getProducts = async (req, res) => {
@@ -77,5 +82,59 @@ exports.deleteProduct = async (req, res) => {
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Get recommended products for authenticated user
+exports.getRecommendedProducts = async (req, res) => {
+  try {
+    // Get user ID from auth token (from authMiddleware)
+    const userId = req.user.id;
+    const { limit = 5, groupByCategory = false, detailed = false } = req.query;
+
+    // Fetch user's skin profile
+    const userProfile = await SkinProfile.findOne({ user: userId });
+    if (!userProfile) {
+      return res.status(404).json({
+        error: 'User profile not found. Please complete the skin quiz first.',
+      });
+    }
+
+    // Fetch all products
+    const allProducts = await Product.find();
+
+    // Get recommendations using appropriate function
+    let recommendations;
+    if (detailed === 'true') {
+      recommendations = getDetailedRecommendations(
+        userProfile,
+        allProducts,
+        parseInt(limit) || 5
+      );
+    } else {
+      recommendations = getRecommendedProducts(
+        userProfile,
+        allProducts,
+        {
+          limit: parseInt(limit) || 5,
+          groupByCategory: groupByCategory === 'true',
+        }
+      );
+    }
+
+    res.json({
+      success: true,
+      count: recommendations.length,
+      userProfile: {
+        skinType: userProfile.skinType,
+        concerns: userProfile.concerns,
+        allergies: userProfile.allergies,
+        sensitivityLevel: userProfile.sensitivityLevel,
+      },
+      recommendations,
+    });
+  } catch (err) {
+    console.error('Recommendation error:', err);
+    res.status(500).json({ error: 'Server error retrieving recommendations' });
   }
 };

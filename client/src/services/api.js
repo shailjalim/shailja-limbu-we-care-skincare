@@ -375,6 +375,43 @@ export const getAllProducts = async () => {
     }
 };
 
+/**
+ * Get personalized product recommendations based on user's skin profile
+ * 
+ * @param {Object} options - { limit?: 5, groupByCategory?: false, detailed?: false }
+ * @returns {Promise<Object>} - Recommended products with scores and user profile
+ */
+export const getRecommendedProducts = async (options = {}) => {
+    try {
+        const params = {
+            limit: options.limit || 5,
+            groupByCategory: options.groupByCategory || false,
+            detailed: options.detailed || false,
+        };
+        const response = await apiClient.get('/products/recommendations/personalized', { params });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * Get detailed recommendations with reasoning and match percentages
+ * 
+ * @param {Object} options - { limit?: 5 }
+ * @returns {Promise<Object>} - Recommendations with reasons and match percentages
+ */
+export const getDetailedRecommendations = async (options = {}) => {
+    try {
+        return getRecommendedProducts({
+            limit: options.limit || 5,
+            detailed: true,
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 // ================== ROUTINE TRACKER API ==================
 
 export const getRoutines = async () => {
