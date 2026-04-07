@@ -4,6 +4,7 @@ import {
     getRoutines,
     createRoutine,
     updateRoutine,
+    completeRoutine,
     deleteRoutine,
     getAllProducts,
     getSkinProfile,
@@ -24,6 +25,12 @@ const RoutineTracker = () => {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [prefillApplied, setPrefillApplied] = useState(false);
+    const [completingRoutineId, setCompletingRoutineId] = useState(null);
+    const [routineStats, setRoutineStats] = useState({
+        totalCompleted: 0,
+        weeklyCompleted: 0,
+        lastCompletedDate: null,
+    });
 
     const loadRoutines = async () => {
         setLoading(true);
@@ -56,6 +63,11 @@ const RoutineTracker = () => {
             const response = await getSkinProfile();
             if (response.success && response.profile?.skinType) {
                 setUserSkinType(response.profile.skinType);
+                setRoutineStats(response.profile.routineStats || {
+                    totalCompleted: 0,
+                    weeklyCompleted: 0,
+                    lastCompletedDate: null,
+                });
                 const type = response.profile.skinType === 'night' ? 'night' : 'morning';
                 if (!selectedRoutineId) setRoutineType(type);
             }
@@ -275,6 +287,26 @@ const RoutineTracker = () => {
         }
     };
 
+    const handleCompleteRoutine = async (routineId) => {
+        setError('');
+        setMessage('');
+        setCompletingRoutineId(routineId);
+
+        try {
+            const response = await completeRoutine(routineId);
+
+            setRoutineStats(response.routineStats || routineStats);
+            setMessage(response.message || 'Routine completion updated');
+
+            await loadProfileToSuggest();
+            await loadRoutines();
+        } catch (err) {
+            setError(err.message || 'Unable to mark routine as completed');
+        } finally {
+            setCompletingRoutineId(null);
+        }
+    };
+
     const getProductName = (productId) => {
         const prod = products.find((p) => String(p._id) === String(productId));
         return prod ? prod.name : 'Unknown Product';
@@ -289,6 +321,17 @@ const RoutineTracker = () => {
 
             {error && <div className="mb-4 rounded-3xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>}
             {message && <div className="mb-4 rounded-3xl border border-green-200 bg-green-50 p-4 text-green-700">{message}</div>}
+
+            <div className="mb-6 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-blue-200 bg-blue-50 p-4">
+                    <p className="text-sm text-blue-700">You completed routines this week</p>
+                    <p className="mt-1 text-2xl font-bold text-blue-900">{routineStats.weeklyCompleted || 0}</p>
+                </div>
+                <div className="rounded-3xl border border-purple-200 bg-purple-50 p-4">
+                    <p className="text-sm text-purple-700">Total routines completed</p>
+                    <p className="mt-1 text-2xl font-bold text-purple-900">{routineStats.totalCompleted || 0}</p>
+                </div>
+            </div>
 
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -384,6 +427,13 @@ const RoutineTracker = () => {
                                                 className="rounded-full border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 transition"
                                             >
                                                 {routine.isActive ? 'Pause' : 'Activate'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleCompleteRoutine(routine._id)}
+                                                disabled={completingRoutineId === routine._id || !routine.isActive}
+                                                className="rounded-full border border-green-300 px-3 py-1 text-sm text-green-700 hover:bg-green-50 transition disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                {completingRoutineId === routine._id ? 'Saving...' : 'Mark Routine as Completed'}
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(routine._id)}

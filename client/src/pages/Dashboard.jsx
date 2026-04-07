@@ -406,10 +406,22 @@ const Dashboard = () => {
                                 {/* Activity & Progress */}
                                 <div className="bg-white rounded-2xl shadow-sm p-6">
                                     <h2 className="text-lg font-semibold text-gray-800 mb-4">Your Activity</h2>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="mb-4 text-sm text-gray-600">
+                                        <p>You completed {profile?.routineStats?.weeklyCompleted || 0} routines this week.</p>
+                                        <p>Total routines completed: {profile?.routineStats?.totalCompleted || 0}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         <div className="p-4 bg-pink-50 rounded-xl text-center">
                                             <p className="text-3xl font-bold text-pink-600">{routines.length}</p>
                                             <p className="text-sm text-gray-600 mt-1">Routines Created</p>
+                                        </div>
+                                        <div className="p-4 bg-green-50 rounded-xl text-center">
+                                            <p className="text-3xl font-bold text-green-600">{profile?.routineStats?.weeklyCompleted || 0}</p>
+                                            <p className="text-sm text-gray-600 mt-1">Completed This Week</p>
+                                        </div>
+                                        <div className="p-4 bg-purple-50 rounded-xl text-center">
+                                            <p className="text-3xl font-bold text-purple-600">{profile?.routineStats?.totalCompleted || 0}</p>
+                                            <p className="text-sm text-gray-600 mt-1">Total Completed</p>
                                         </div>
                                         <div className="p-4 bg-blue-50 rounded-xl text-center">
                                             <p className="text-3xl font-bold text-blue-600">{profile?.goals?.length || 0}</p>

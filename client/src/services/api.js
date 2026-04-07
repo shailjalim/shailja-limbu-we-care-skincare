@@ -441,6 +441,15 @@ export const updateRoutine = async (routineId, routineData) => {
     }
 };
 
+export const completeRoutine = async (routineId) => {
+    try {
+        const response = await apiClient.post('/routines/complete', { routineId });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const deleteRoutine = async (routineId) => {
     try {
         const response = await apiClient.delete(`/routines/${routineId}`);

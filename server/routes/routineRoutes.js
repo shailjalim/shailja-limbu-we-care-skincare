@@ -4,6 +4,7 @@ const { protect } = require('../middleware/authMiddleware');
 const {
   createRoutine,
   getRoutines,
+  completeRoutine,
   updateRoutine,
   deleteRoutine,
 } = require('../controllers/routineController');
@@ -11,6 +12,7 @@ const {
 router.use(protect);
 router.get('/', getRoutines);
 router.post('/', createRoutine);
+router.post('/complete', completeRoutine);
 router.put('/:id', updateRoutine);
 router.delete('/:id', deleteRoutine);
 

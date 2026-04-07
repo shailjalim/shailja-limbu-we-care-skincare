@@ -1,4 +1,6 @@
 const Routine = require('../models/Routine');
+const SkinProfile = require('../models/SkinProfile');
+const { getUpdatedRoutineStats } = require('../services/routineCompletionService');
 
 const VALID_ROUTINE_TYPES = ['morning', 'night'];
 const VALID_STEP_NAMES = ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'Sunscreen'];
@@ -103,5 +105,52 @@ exports.deleteRoutine = async (req, res) => {
   } catch (error) {
     console.error('deleteRoutine error', error);
     res.status(500).json({ success: false, message: 'Server error deleting routine' });
+  }
+};
+
+exports.completeRoutine = async (req, res) => {
+  try {
+    const { routineId } = req.body;
+
+    if (!routineId) {
+      return res.status(400).json({ success: false, message: 'routineId is required' });
+    }
+
+    const routine = await Routine.findOne({ _id: routineId, user_id: req.user._id });
+    if (!routine) {
+      return res.status(404).json({ success: false, message: 'Routine not found' });
+    }
+
+    if (!routine.isActive) {
+      return res.status(400).json({ success: false, message: 'Cannot complete a paused routine' });
+    }
+
+    const profile = await SkinProfile.findOne({ user: req.user._id });
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Skin profile not found' });
+    }
+
+    const { alreadyCompletedToday, updatedStats } = getUpdatedRoutineStats(profile.routineStats, new Date());
+
+    if (alreadyCompletedToday) {
+      return res.status(200).json({
+        success: false,
+        alreadyCompletedToday: true,
+        message: 'Routine already completed today',
+        routineStats: updatedStats,
+      });
+    }
+
+    profile.routineStats = updatedStats;
+    await profile.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Routine marked as completed',
+      routineStats: profile.routineStats,
+    });
+  } catch (error) {
+    console.error('completeRoutine error', error);
+    return res.status(500).json({ success: false, message: 'Server error completing routine' });
   }
 };
