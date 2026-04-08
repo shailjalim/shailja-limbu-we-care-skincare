@@ -14,6 +14,7 @@ const {
     registerUser,
     loginUser,
     getCurrentUser,
+    getAdminRegistrationStatus,
     forgotPassword,
     resetPassword,
 } = require('../controllers/authController');
@@ -34,6 +35,13 @@ router.post('/register', registerUser);
  * @access  Public
  */
 router.post('/login', loginUser);
+
+/**
+ * @route   GET /api/auth/admin-status
+ * @desc    Check if admin registration is still available
+ * @access  Public
+ */
+router.get('/admin-status', getAdminRegistrationStatus);
 
 /**
  * @route   GET /api/auth/me

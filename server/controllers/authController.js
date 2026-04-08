@@ -263,6 +263,32 @@ const getCurrentUser = async (req, res) => {
 };
 
 /**
+ * Get Admin Registration Status
+ *
+ * @route   GET /api/auth/admin-status
+ * @desc    Check if an admin account already exists
+ * @access  Public
+ *
+ * @returns {Object} - Admin existence status
+ */
+const getAdminRegistrationStatus = async (req, res) => {
+    try {
+        const adminExists = (await User.countDocuments({ role: 'admin' })) > 0;
+
+        return res.status(200).json({
+            success: true,
+            adminExists,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while checking admin registration status',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
  * Forgot Password
  * 
  * @route   POST /api/auth/forgot-password
@@ -441,6 +467,7 @@ module.exports = {
     registerUser,
     loginUser,
     getCurrentUser,
+    getAdminRegistrationStatus,
     forgotPassword,
     resetPassword,
 };

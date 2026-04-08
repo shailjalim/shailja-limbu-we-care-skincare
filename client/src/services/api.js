@@ -252,6 +252,20 @@ export const getCurrentUser = async () => {
 };
 
 /**
+ * Check admin registration availability
+ *
+ * @returns {Promise<Object>} - { success, adminExists }
+ */
+export const getAdminStatus = async () => {
+    try {
+        const response = await apiClient.get('/auth/admin-status');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
  * Request password reset email
  * 
  * @param {string} email - User's email address
