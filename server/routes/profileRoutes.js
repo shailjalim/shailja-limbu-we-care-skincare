@@ -15,7 +15,7 @@ const express = require('express');
 const router = express.Router();
 
 // Import authentication middleware
-const { protect } = require('../middleware/authMiddleware');
+const { protect, userOnly } = require('../middleware/authMiddleware');
 
 // Import controller functions
 const { 
@@ -31,7 +31,7 @@ const {
  * @desc    Get current authenticated user's skin profile
  * @access  Private
  */
-router.get('/me', protect, getMyProfile);
+router.get('/me', protect, userOnly, getMyProfile);
 
 /**
  * @route   POST /api/profile
@@ -43,6 +43,6 @@ router.get('/me', protect, getMyProfile);
  * @body    {string[]} allergies - Optional. Array of known allergies
  * @body    {string[]} goals - Optional. Array of skincare goals
  */
-router.post('/', protect, createOrUpdateProfile);
+router.post('/', protect, userOnly, createOrUpdateProfile);
 
 module.exports = router;

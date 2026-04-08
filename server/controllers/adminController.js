@@ -65,10 +65,14 @@ exports.deleteUser = async (req, res) => {
             }
         }
 
-        await user.remove();
+        await user.deleteOne();
         res.status(200).json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error while deleting user' });
+        res.status(500).json({
+            success: false,
+            message: 'Server error while deleting user',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
     }
 };
 

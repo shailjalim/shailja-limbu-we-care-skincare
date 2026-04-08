@@ -8,7 +8,8 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Link, Navigate } from 'react-router-dom';
+import { getUser, isAuthenticated } from './services/api';
 
 // Components
 import Navbar from './components/Navbar';
@@ -53,16 +54,24 @@ import AdminConsultations from './pages/AdminConsultations';
  */
 const Layout = ({ children }) => {
     const location = useLocation();
+    const authenticated = isAuthenticated();
+    const user = getUser();
+    const isAdmin = authenticated && user?.role === 'admin';
     
     // Routes where navbar should be hidden
     const hideNavbarRoutes = ['/login', '/register', '/forgot-password', '/quiz'];
     const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+    const showChatbotWidget = !shouldHideNavbar && !location.pathname.startsWith('/admin') && !isAdmin;
+
+    if (isAdmin && !location.pathname.startsWith('/admin')) {
+        return <Navigate to="/admin" replace />;
+    }
     
     return (
         <div className="min-h-screen bg-white">
             {/* Navigation Bar - Hidden on auth pages */}
             {!shouldHideNavbar && <Navbar />}
-            {!shouldHideNavbar && <ChatbotWidget />}
+            {showChatbotWidget && <ChatbotWidget />}
             
             {/* Main Content */}
             {children}

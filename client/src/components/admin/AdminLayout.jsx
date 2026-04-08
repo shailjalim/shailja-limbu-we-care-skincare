@@ -37,10 +37,10 @@ const AdminLayout = () => {
           </nav>
 
           <Link
-            to="/dashboard"
+            to="/admin"
             className="mt-6 inline-block w-full rounded-xl border border-gray-200 px-4 py-3 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
-            Back to User Dashboard
+            Admin Home
           </Link>
         </aside>
 

@@ -119,6 +119,28 @@ const authorize = (...roles) => {
     };
 };
 
+/**
+ * User Only Middleware
+ * 
+ * Restricts access to regular users only.
+ * Blocks admin users from accessing user-only features.
+ * Must be used after protect middleware.
+ * 
+ * Usage: Add as middleware to user-only routes
+ * 
+ * @example
+ * router.post('/', protect, userOnly, createRoutine);
+ */
+const userOnly = (req, res, next) => {
+    if (req.user.role === 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: 'Admin accounts cannot access user features',
+        });
+    }
+    next();
+};
+
 // Aliases for clearer role-based middleware naming
 const verifyToken = protect;
 const adminOnly = authorize('admin');
@@ -128,6 +150,7 @@ module.exports = {
     authorize,
     verifyToken,
     adminOnly,
+    userOnly,
 };
 
 

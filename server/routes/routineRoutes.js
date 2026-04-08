@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
+const { protect, userOnly } = require('../middleware/authMiddleware');
 const {
   createRoutine,
   getRoutines,
@@ -9,7 +9,7 @@ const {
   deleteRoutine,
 } = require('../controllers/routineController');
 
-router.use(protect);
+router.use(protect, userOnly);
 router.get('/', getRoutines);
 router.post('/', createRoutine);
 router.post('/complete', completeRoutine);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, authorize, userOnly } = require('../middleware/authMiddleware');
 const {
   requestConsultation,
   getMyConsultations,
@@ -9,8 +9,8 @@ const {
 } = require('../controllers/consultationController');
 
 router.use(protect);
-router.post('/', requestConsultation);
-router.get('/', getMyConsultations);
+router.post('/', userOnly, requestConsultation);
+router.get('/', userOnly, getMyConsultations);
 
 // Admin-only consultation management
 router.get('/admin/all', authorize('admin'), getAllConsultations);

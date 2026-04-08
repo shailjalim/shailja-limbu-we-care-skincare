@@ -17,6 +17,7 @@ const Navbar = () => {
     
     const location = useLocation();
     const navigate = useNavigate();
+    const isAdmin = user?.role === 'admin';
 
     useEffect(() => {
         const checkAuth = () => {
@@ -65,8 +66,16 @@ const Navbar = () => {
         ...(user?.role === 'admin' ? [{ name: 'Admin', path: '/admin' }] : []),
     ];
 
+    const adminNavLinks = [
+        { name: 'Admin Dashboard', path: '/admin' },
+        { name: 'Products', path: '/admin/products' },
+        { name: 'Users', path: '/admin/users' },
+        { name: 'Articles', path: '/admin/articles' },
+        { name: 'Consultations', path: '/admin/consultations' },
+    ];
+
     // Use appropriate nav links based on auth state
-    const navLinks = isLoggedIn ? dashboardNavLinks : publicNavLinks;
+    const navLinks = isLoggedIn ? (isAdmin ? adminNavLinks : dashboardNavLinks) : publicNavLinks;
 
     const isActiveLink = (path) => {
         return location.pathname === path;
@@ -75,7 +84,7 @@ const Navbar = () => {
     return (
         <nav className="w-full px-8 lg:px-20 py-6 flex items-center justify-between shadow-sm bg-white sticky top-0 z-50">
             {/* Logo - Links to dashboard when logged in, home when logged out */}
-            <Link to={isLoggedIn ? "/dashboard" : "/"} className="text-3xl font-bold text-pink-600 tracking-wide hover:text-pink-700 transition">
+            <Link to={isLoggedIn ? (isAdmin ? "/admin" : "/dashboard") : "/"} className="text-3xl font-bold text-pink-600 tracking-wide hover:text-pink-700 transition">
                 WeCare
             </Link>
 
@@ -102,7 +111,7 @@ const Navbar = () => {
                 {isLoggedIn ? (
                     <>
                         <Link 
-                            to="/dashboard"
+                            to={isAdmin ? '/admin' : '/dashboard'}
                             className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition"
                         >
                             <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
@@ -177,7 +186,7 @@ const Navbar = () => {
                             <>
                                 <li className="px-8 py-3 border-t border-gray-100">
                                     <Link 
-                                        to="/dashboard"
+                                        to={isAdmin ? '/admin' : '/dashboard'}
                                         className="flex items-center space-x-3 text-gray-700"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
