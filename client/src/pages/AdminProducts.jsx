@@ -9,10 +9,12 @@ import {
 
 const initialForm = {
   name: '',
+  category: 'General',
   description: '',
   price: '',
   skinType: 'normal',
   concerns: '',
+  benefits: '',
   ingredients: '',
   imageUrl: '',
 };
@@ -53,10 +55,12 @@ const AdminProducts = () => {
     setEditingId(item._id);
     setForm({
       name: item.name || '',
+      category: item.category || 'General',
       description: item.description || '',
       price: item.price ?? '',
       skinType: item.skinTypes?.[0] || 'normal',
       concerns: (item.concerns || []).join(', '),
+      benefits: (item.benefits || []).join(', '),
       ingredients: (item.ingredients || []).join(', '),
       imageUrl: item.image || '',
     });
@@ -71,7 +75,9 @@ const AdminProducts = () => {
     const payload = {
       ...form,
       price: Number(form.price),
+      category: form.category,
       concerns: form.concerns,
+      benefits: form.benefits,
       ingredients: form.ingredients,
     };
 
@@ -148,6 +154,14 @@ const AdminProducts = () => {
       <AdminModal isOpen={isModalOpen} title={editingId ? 'Edit Product' : 'Add Product'} onClose={() => setIsModalOpen(false)}>
         <form onSubmit={handleSave} className="space-y-4">
           <input className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <select className="w-full rounded-xl border border-gray-300 px-4 py-3" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+            <option value="Cleanser">Cleanser</option>
+            <option value="Toner">Toner</option>
+            <option value="Serum">Serum</option>
+            <option value="Moisturizer">Moisturizer</option>
+            <option value="Sunscreen">Sunscreen</option>
+            <option value="General">General</option>
+          </select>
           <textarea className="w-full rounded-xl border border-gray-300 px-4 py-3" rows={4} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
           <input type="number" min="0" step="0.01" className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
           <select className="w-full rounded-xl border border-gray-300 px-4 py-3" value={form.skinType} onChange={(e) => setForm({ ...form, skinType: e.target.value })}>
@@ -158,6 +172,7 @@ const AdminProducts = () => {
             <option value="normal">Normal</option>
           </select>
           <input className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Concerns (comma separated)" value={form.concerns} onChange={(e) => setForm({ ...form, concerns: e.target.value })} />
+          <input className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Benefits (comma separated)" value={form.benefits} onChange={(e) => setForm({ ...form, benefits: e.target.value })} />
           <input className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Ingredients (comma separated)" value={form.ingredients} onChange={(e) => setForm({ ...form, ingredients: e.target.value })} />
           <input className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
           <button type="submit" className="w-full rounded-xl bg-pink-600 px-4 py-3 font-medium text-white hover:bg-pink-700 transition">{editingId ? 'Update Product' : 'Create Product'}</button>

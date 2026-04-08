@@ -1,4 +1,7 @@
 const Product = require('../models/Product');
+const { buildRecommendationFields, VALID_CONCERNS, VALID_SKIN_TYPES } = require('../utils/productRecommendationFields');
+
+const VALID_CATEGORIES = ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'Sunscreen', 'General'];
 
 const normalizeArray = (value) => {
   if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
@@ -8,18 +11,38 @@ const normalizeArray = (value) => {
 
 const normalizeLowerArray = (value) => normalizeArray(value).map((item) => item.toLowerCase());
 
+const normalizeCategory = (value) => {
+  const category = String(value || '').trim();
+  const matchedCategory = VALID_CATEGORIES.find((item) => item.toLowerCase() === category.toLowerCase());
+  return matchedCategory || 'General';
+};
+
+const normalizeAllowedValues = (value, allowedValues) => {
+  const allowedSet = new Set(allowedValues);
+  return normalizeLowerArray(value).filter((item) => allowedSet.has(item));
+};
+
 const mapProductPayload = (body = {}) => {
   const skinTypeInput = body.skinTypes || body.skinType || [];
+  const explicitConcerns = normalizeAllowedValues(body.concerns, VALID_CONCERNS);
+  const explicitSkinTypes = normalizeAllowedValues(skinTypeInput, VALID_SKIN_TYPES);
+  const baseProduct = {
+    name: body.name,
+    description: body.description,
+    category: normalizeCategory(body.category),
+    benefits: normalizeArray(body.benefits),
+  };
+  const inferredFields = buildRecommendationFields(baseProduct, { preserveExisting: false });
 
   return {
     name: body.name,
     description: body.description,
     price: Number(body.price),
-    category: body.category || 'General',
-    skinTypes: normalizeLowerArray(skinTypeInput),
-    concerns: normalizeLowerArray(body.concerns),
+    category: normalizeCategory(body.category),
+    skinTypes: explicitSkinTypes.length > 0 ? explicitSkinTypes : inferredFields.skinTypes,
+    concerns: explicitConcerns.length > 0 ? explicitConcerns : inferredFields.concerns,
     ingredients: normalizeArray(body.ingredients),
-    benefits: normalizeArray(body.benefits),
+    benefits: baseProduct.benefits,
     image: body.imageUrl || body.image,
   };
 };
@@ -43,7 +66,11 @@ exports.createAdminProduct = async (req, res) => {
     const product = await Product.create(payload);
     return res.status(201).json({ success: true, product });
   } catch (error) {
-    return res.status(400).json({ success: false, message: 'Invalid product data' });
+    return res.status(400).json({
+      success: false,
+      message: error.name === 'ValidationError' ? error.message : 'Invalid product data',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
   }
 };
 
@@ -73,7 +100,11 @@ exports.updateAdminProduct = async (req, res) => {
 
     return res.status(200).json({ success: true, product });
   } catch (error) {
-    return res.status(400).json({ success: false, message: 'Invalid product data' });
+    return res.status(400).json({
+      success: false,
+      message: error.name === 'ValidationError' ? error.message : 'Invalid product data',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
   }
 };
 
