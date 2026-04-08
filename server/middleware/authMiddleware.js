@@ -141,6 +141,69 @@ const userOnly = (req, res, next) => {
     next();
 };
 
+/**
+ * Check Subscription Middleware
+ *
+ * Ensures active subscription is still valid and auto-expires outdated subscriptions.
+ * Must be used after protect middleware.
+ */
+const checkSubscription = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Not authorized, user not found on request',
+            });
+        }
+
+        const subscription = req.user.subscription || {};
+        if (subscription.isActive && subscription.expiryDate) {
+            const isExpired = Date.now() > new Date(subscription.expiryDate).getTime();
+
+            if (isExpired) {
+                req.user.subscription = {
+                    isActive: false,
+                    plan: null,
+                    startDate: null,
+                    expiryDate: null,
+                };
+
+                // Keep legacy fields synchronized.
+                req.user.subscriptionStatus = 'free';
+                req.user.subscriptionPlan = 'none';
+                req.user.subscriptionExpires = null;
+
+                await req.user.save();
+            }
+        }
+
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while checking subscription',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Premium Only Middleware
+ *
+ * Blocks access when user does not have an active premium subscription.
+ * Must be used after checkSubscription middleware.
+ */
+const premiumOnly = (req, res, next) => {
+    if (!req.user?.subscription?.isActive) {
+        return res.status(403).json({
+            success: false,
+            message: 'Premium subscription required',
+        });
+    }
+
+    next();
+};
+
 // Aliases for clearer role-based middleware naming
 const verifyToken = protect;
 const adminOnly = authorize('admin');
@@ -151,6 +214,8 @@ module.exports = {
     verifyToken,
     adminOnly,
     userOnly,
+    checkSubscription,
+    premiumOnly,
 };
 
 

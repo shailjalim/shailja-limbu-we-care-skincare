@@ -495,6 +495,24 @@ export const deleteRoutine = async (routineId) => {
 
 // ================== SUBSCRIPTION API ==================
 
+export const activateSubscription = async (plan, paymentMethod = 'simulation') => {
+    try {
+        const response = await apiClient.post('/subscription/activate', { plan, paymentMethod });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getSubscriptionStatus = async () => {
+    try {
+        const response = await apiClient.get('/subscription/status');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getCurrentSubscription = async () => {
     try {
         const response = await apiClient.get('/subscriptions/current');
@@ -505,12 +523,7 @@ export const getCurrentSubscription = async () => {
 };
 
 export const subscribeToPlan = async (plan, paymentMethod) => {
-    try {
-        const response = await apiClient.post('/subscriptions/subscribe', { plan, paymentMethod });
-        return response;
-    } catch (error) {
-        throw error;
-    }
+    return activateSubscription(plan, paymentMethod);
 };
 
 export const cancelSubscription = async (subscriptionId) => {

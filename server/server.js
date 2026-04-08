@@ -101,6 +101,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/routines', routineRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/content', contentRoutes);

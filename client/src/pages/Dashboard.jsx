@@ -12,7 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getSkinProfile, getUser, getAllProducts, getContent, getRoutines } from '../services/api';
+import { getSkinProfile, getUser, getAllProducts, getContent, getRoutines, getSubscriptionStatus } from '../services/api';
 import { getRecommendedContent } from '../utils/contentRecommendation';
 
 /**
@@ -82,6 +82,12 @@ const Dashboard = () => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [recommendedContent, setRecommendedContent] = useState([]);
     const [routines, setRoutines] = useState([]);
+    const [subscriptionStatus, setSubscriptionStatus] = useState({
+        isActive: false,
+        plan: null,
+        expiryDate: null,
+        daysRemaining: 0,
+    });
 
     const navigate = useNavigate();
 
@@ -97,6 +103,18 @@ const Dashboard = () => {
                 // Get user data from localStorage
                 const userData = getUser();
                 setUser(userData);
+
+                try {
+                    const subscriptionResponse = await getSubscriptionStatus();
+                    setSubscriptionStatus({
+                        isActive: !!subscriptionResponse.isActive,
+                        plan: subscriptionResponse.plan || null,
+                        expiryDate: subscriptionResponse.expiryDate || null,
+                        daysRemaining: Number(subscriptionResponse.daysRemaining || 0),
+                    });
+                } catch (subscriptionErr) {
+                    console.warn('Failed to load subscription status:', subscriptionErr);
+                }
 
                 // Fetch skin profile from API
                 const profileResponse = await getSkinProfile();
@@ -224,6 +242,18 @@ const Dashboard = () => {
                         {/* Quick Actions */}
                         <div className="bg-white rounded-2xl shadow-sm p-6">
                             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                            <div className={`mb-4 rounded-xl border p-3 ${subscriptionStatus.isActive ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <p className="text-sm font-semibold text-gray-800">
+                                    {subscriptionStatus.isActive ? 'Premium Active' : 'Free User'}
+                                </p>
+                                {subscriptionStatus.isActive ? (
+                                    <p className="text-xs text-gray-600 mt-1">
+                                        {subscriptionStatus.plan} plan · {subscriptionStatus.daysRemaining} days remaining
+                                    </p>
+                                ) : (
+                                    <p className="text-xs text-gray-600 mt-1">Upgrade to unlock premium consultation access.</p>
+                                )}
+                            </div>
                             <div className="space-y-3">
                                 <Link 
                                     to="/routines"
@@ -283,7 +313,7 @@ const Dashboard = () => {
                                 >
                                     <div className="flex items-center">
                                         <span className="text-xl mr-2">⭐</span>
-                                        <span className="font-medium text-gray-800 text-sm">Subscription</span>
+                                        <span className="font-medium text-gray-800 text-sm">Upgrade to Premium</span>
                                     </div>
                                     <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

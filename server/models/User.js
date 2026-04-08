@@ -50,6 +50,25 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
+        subscription: {
+            isActive: {
+                type: Boolean,
+                default: false,
+            },
+            plan: {
+                type: String,
+                enum: ['monthly', 'half-yearly', 'yearly', null],
+                default: null,
+            },
+            startDate: {
+                type: Date,
+                default: null,
+            },
+            expiryDate: {
+                type: Date,
+                default: null,
+            },
+        },
         subscriptionStatus: {
             type: String,
             enum: ['free', 'premium'],
@@ -57,7 +76,7 @@ const userSchema = new mongoose.Schema(
         },
         subscriptionPlan: {
             type: String,
-            enum: ['monthly', 'yearly', 'none'],
+            enum: ['monthly', 'half-yearly', 'yearly', 'none'],
             default: 'none',
         },
         subscriptionExpires: {
