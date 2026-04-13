@@ -7,6 +7,8 @@ const { getRecommendedProducts } = require('../utils/productRecommendation');
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_HISTORY_ITEMS = 5;
 const FALLBACK_REPLY = 'I could not generate a response right now. Please try again in a moment.';
+const GEMINI_MAX_ATTEMPTS = 2;
+const GEMINI_RETRY_DELAY_MS = 350;
 
 const geminiClient = process.env.GEMINI_API_KEY
   ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
@@ -61,6 +63,47 @@ Instructions:
 - If recommending products, use only provided product list`;
 };
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const shouldRetryGeminiError = (error) => {
+  const message = String(error?.message || '').toLowerCase();
+  const status = Number(error?.status || error?.code || error?.response?.status || 0);
+
+  // Retry transient provider/network issues that commonly happen on first attempt.
+  return (
+    [429, 500, 502, 503, 504].includes(status) ||
+    message.includes('overloaded') ||
+    message.includes('timeout') ||
+    message.includes('timed out') ||
+    message.includes('temporar') ||
+    message.includes('unavailable') ||
+    message.includes('econnreset') ||
+    message.includes('etimedout')
+  );
+};
+
+const generateReplyWithRetry = async (prompt) => {
+  const model = geminiClient.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= GEMINI_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const reply = response.text()?.trim();
+      return reply || FALLBACK_REPLY;
+    } catch (error) {
+      lastError = error;
+      if (attempt >= GEMINI_MAX_ATTEMPTS || !shouldRetryGeminiError(error)) {
+        throw error;
+      }
+      await wait(GEMINI_RETRY_DELAY_MS * attempt);
+    }
+  }
+
+  throw lastError || new Error('Failed to generate chatbot reply');
+};
+
 exports.chatWithAssistant = async (req, res) => {
   try {
     const rawMessage = typeof req.body?.message === 'string' ? req.body.message : '';
@@ -108,10 +151,7 @@ exports.chatWithAssistant = async (req, res) => {
     const history = sanitizeHistory(req.body?.history);
     const prompt = buildPrompt(profile, recommendedProducts, message, history);
 
-    const model = geminiClient.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const reply = response.text()?.trim() || FALLBACK_REPLY;
+    const reply = await generateReplyWithRetry(prompt);
 
     // Save assistant response to conversation
     conversation.messages.push({ role: 'assistant', content: reply });

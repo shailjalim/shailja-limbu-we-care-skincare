@@ -559,26 +559,6 @@ const Dashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Personalized Tip */}
-                                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl shadow-lg p-6 text-white">
-                                    <h2 className="text-lg font-semibold mb-2">💡 Personalized Tip</h2>
-                                    <p className="opacity-90 text-sm mb-4">
-                                        {profile.skinType === 'oily' && "Use oil-free moisturizers and clay masks weekly to control excess sebum."}
-                                        {profile.skinType === 'dry' && "Hydrate with hyaluronic acid serums and avoid hot water when washing your face."}
-                                        {profile.skinType === 'combination' && "Balance your routine with gentle cleansers and zone-specific treatments."}
-                                        {profile.skinType === 'sensitive' && "Choose fragrance-free products and always patch test new skincare items."}
-                                        {profile.skinType === 'normal' && "Maintain your healthy skin with consistent SPF and antioxidant serums."}
-                                    </p>
-                                    <Link 
-                                        to="/features"
-                                        className="inline-flex items-center text-sm font-medium hover:underline"
-                                    >
-                                        Learn more tips
-                                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </Link>
-                                </div>
                             </>
                         )}
                     </div>
