@@ -23,6 +23,14 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
  */
 const TOKEN_KEY = 'wecare_token';
 const USER_KEY = 'wecare_user';
+const LEGACY_TOKEN_KEY = 'authToken';
+const LEGACY_USER_KEY = 'authUser';
+
+// Remove legacy persisted auth so restarting the app returns to the landing page.
+localStorage.removeItem(TOKEN_KEY);
+localStorage.removeItem(USER_KEY);
+localStorage.removeItem(LEGACY_TOKEN_KEY);
+localStorage.removeItem(LEGACY_USER_KEY);
 
 /**
  * Axios Instance
@@ -43,7 +51,7 @@ const apiClient = axios.create({
  * @returns {string|null} - The stored token or null
  */
 export const getToken = () => {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
 };
 
 /**
@@ -51,14 +59,14 @@ export const getToken = () => {
  * @param {string} token - JWT token to store
  */
 export const setToken = (token) => {
-    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
 };
 
 /**
  * Remove authentication token
  */
 export const removeToken = () => {
-    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
 };
 
 /**
@@ -66,7 +74,7 @@ export const removeToken = () => {
  * @returns {Object|null} - The stored user object or null
  */
 export const getStoredUser = () => {
-    const user = localStorage.getItem(USER_KEY);
+    const user = sessionStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 };
 
@@ -81,14 +89,14 @@ export const getUser = getStoredUser;
  * @param {Object} user - User object to store
  */
 export const setStoredUser = (user) => {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
 /**
  * Remove stored user data
  */
 export const removeStoredUser = () => {
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(USER_KEY);
 };
 
 /**
@@ -539,7 +547,21 @@ export const cancelSubscription = async (subscriptionId) => {
 
 export const requestConsultation = async (consultationData) => {
     try {
-        const response = await apiClient.post('/consultations', consultationData);
+        const formData = new FormData();
+        formData.append('title', consultationData?.title || '');
+        formData.append('description', consultationData?.description || '');
+
+        if (Array.isArray(consultationData?.images)) {
+            consultationData.images.forEach((file) => {
+                formData.append('images', file);
+            });
+        }
+
+        const response = await apiClient.post('/consultations', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response;
     } catch (error) {
         throw error;
@@ -548,7 +570,7 @@ export const requestConsultation = async (consultationData) => {
 
 export const getMyConsultations = async () => {
     try {
-        const response = await apiClient.get('/consultations');
+        const response = await apiClient.get('/consultations/my');
         return response;
     } catch (error) {
         throw error;
@@ -770,7 +792,26 @@ export const getAdminConsultations = async () => {
 
 export const updateAdminConsultation = async (consultationId, payload) => {
     try {
-        const response = await apiClient.put(`/admin/consultations/${consultationId}`, payload);
+        const formData = new FormData();
+        if (payload?.status !== undefined) {
+            formData.append('status', payload.status);
+        }
+
+        if (payload?.adminReply !== undefined) {
+            formData.append('adminReply', payload.adminReply);
+        }
+
+        if (Array.isArray(payload?.replyImages)) {
+            payload.replyImages.forEach((file) => {
+                formData.append('replyImages', file);
+            });
+        }
+
+        const response = await apiClient.put(`/admin/consultations/${consultationId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response;
     } catch (error) {
         throw error;

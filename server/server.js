@@ -13,6 +13,7 @@ require('dotenv').config();
 // Import required packages
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 // Import database connection function
 const { connectDB, getConnectionStatus } = require('./config/db');
@@ -68,6 +69,9 @@ app.use(express.json());
  * Useful for form submissions
  */
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded consultation images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ================== ROUTES ==================
 

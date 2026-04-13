@@ -1,40 +1,74 @@
 const Consultation = require('../models/Consultation');
+const fs = require('fs');
+const path = require('path');
 
-const toApiStatus = (status) => {
-  if (status === 'completed') return 'resolved';
-  return 'pending';
-};
+const VALID_STATUSES = new Set(['pending', 'in-progress', 'completed']);
 
 const toModelStatus = (status) => {
-  if (status === 'resolved') return 'completed';
-  if (status === 'pending') return 'pending';
+  const normalized = String(status || '').trim().toLowerCase();
+  if (VALID_STATUSES.has(normalized)) {
+    return normalized;
+  }
   return undefined;
 };
 
 const formatConsultation = (consultation) => ({
   _id: consultation._id,
-  userId: consultation.user?._id || consultation.user,
-  user: consultation.user
+  userId: consultation.userId?._id || consultation.userId || consultation.user,
+  user: consultation.userId
     ? {
-        _id: consultation.user._id,
-        name: consultation.user.name,
-        email: consultation.user.email,
+        _id: consultation.userId._id,
+        name: consultation.userId.name,
+        email: consultation.userId.email,
       }
-    : undefined,
-  message: consultation.details ? `${consultation.concern}\n${consultation.details}` : consultation.concern,
-  concern: consultation.concern,
-  details: consultation.details,
-  status: toApiStatus(consultation.status),
-  adminReply: consultation.response || '',
-  requestedAt: consultation.requestedAt,
-  respondedAt: consultation.respondedAt,
+    : consultation.user
+      ? {
+          _id: consultation.user._id,
+          name: consultation.user.name,
+          email: consultation.user.email,
+        }
+      : undefined,
+  title: consultation.title || consultation.concern || '',
+  description: consultation.description || consultation.details || '',
+  images: Array.isArray(consultation.images) ? consultation.images : [],
+  profileSnapshot: consultation.profileSnapshot || {
+    skinType: '',
+    concerns: [],
+    allergies: [],
+    sensitivityLevel: '',
+  },
+  status: consultation.status || 'pending',
+  adminReply: consultation.adminReply || consultation.response || '',
+  adminReplyImages: Array.isArray(consultation.adminReplyImages) ? consultation.adminReplyImages : [],
+  createdAt: consultation.createdAt || consultation.requestedAt,
+  updatedAt: consultation.updatedAt || consultation.respondedAt || consultation.requestedAt,
 });
+
+const deleteConsultationImages = async (images = []) => {
+  const deletePromises = images
+    .filter((imagePath) => typeof imagePath === 'string' && imagePath.includes('/uploads/consultations/'))
+    .map(async (imagePath) => {
+      const fileName = path.basename(imagePath);
+      const absolutePath = path.join(__dirname, '..', 'uploads', 'consultations', fileName);
+
+      try {
+        await fs.promises.unlink(absolutePath);
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+      }
+    });
+
+  await Promise.all(deletePromises);
+};
 
 exports.getAdminConsultations = async (req, res) => {
   try {
     const consultations = await Consultation.find()
+      .populate('userId', 'name email')
       .populate('user', 'name email')
-      .sort({ requestedAt: -1 });
+      .sort({ createdAt: -1, requestedAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -47,21 +81,35 @@ exports.getAdminConsultations = async (req, res) => {
 
 exports.updateAdminConsultation = async (req, res) => {
   try {
-    const consultation = await Consultation.findById(req.params.id).populate('user', 'name email');
+    const consultation = await Consultation.findById(req.params.id)
+      .populate('userId', 'name email')
+      .populate('user', 'name email');
+
     if (!consultation) {
       return res.status(404).json({ success: false, message: 'Consultation not found' });
     }
 
-    const nextStatus = toModelStatus(req.body.status);
-    if (nextStatus) {
+    if (req.body.status !== undefined) {
+      const nextStatus = toModelStatus(req.body.status);
+      if (!nextStatus) {
+        return res.status(400).json({
+          success: false,
+          message: 'Status must be one of: pending, in-progress, completed',
+        });
+      }
       consultation.status = nextStatus;
     }
 
     if (typeof req.body.adminReply === 'string') {
-      consultation.response = req.body.adminReply;
-      if (!nextStatus) {
-        consultation.status = 'completed';
-      }
+      const sanitizedReply = String(req.body.adminReply).replace(/[<>]/g, '').trim();
+      consultation.adminReply = sanitizedReply;
+      consultation.response = sanitizedReply;
+      consultation.respondedAt = new Date();
+    }
+
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      await deleteConsultationImages(consultation.adminReplyImages || []);
+      consultation.adminReplyImages = req.files.map((file) => `/uploads/consultations/${file.filename}`);
       consultation.respondedAt = new Date();
     }
 
@@ -75,10 +123,14 @@ exports.updateAdminConsultation = async (req, res) => {
 
 exports.deleteAdminConsultation = async (req, res) => {
   try {
-    const consultation = await Consultation.findByIdAndDelete(req.params.id);
+    const consultation = await Consultation.findById(req.params.id);
     if (!consultation) {
       return res.status(404).json({ success: false, message: 'Consultation not found' });
     }
+
+    await deleteConsultationImages(consultation.images || []);
+    await deleteConsultationImages(consultation.adminReplyImages || []);
+    await consultation.deleteOne();
 
     return res.status(200).json({ success: true, message: 'Consultation deleted' });
   } catch (error) {

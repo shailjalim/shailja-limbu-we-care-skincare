@@ -33,7 +33,7 @@ const PrivateRoute = ({ children }) => {
         // Redirect to login with the attempted URL for redirect after login
         return (
             <Navigate 
-                to="/login" 
+                to="/" 
                 state={{ from: location.pathname }} 
                 replace 
             />

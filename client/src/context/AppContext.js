@@ -124,6 +124,8 @@ export const AppProvider = ({ children }) => {
      * Log out the current user
      */
     const logout = () => {
+        sessionStorage.removeItem('wecare_token');
+        sessionStorage.removeItem('wecare_user');
         localStorage.removeItem('authToken');
         dispatch({ type: ActionTypes.LOGOUT });
     };

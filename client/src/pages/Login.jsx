@@ -38,9 +38,10 @@ const Login = () => {
      * Handle input field changes
      */
     const handleChange = (e) => {
+        const fieldName = e.target.name === 'loginEmail' ? 'email' : e.target.name === 'loginPassword' ? 'password' : e.target.name;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [fieldName]: e.target.value,
         });
         setError('');
     };
@@ -102,7 +103,7 @@ const Login = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
                         {/* Email Field */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -116,10 +117,13 @@ const Login = () => {
                                 </span>
                                 <input
                                     type="email"
-                                    name="email"
+                                    name="loginEmail"
                                     value={formData.email}
                                     onChange={handleChange}
                                     required
+                                    autoComplete="off"
+                                    autoCapitalize="off"
+                                    spellCheck={false}
                                     className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition"
                                     placeholder="you@example.com"
                                 />
@@ -139,10 +143,11 @@ const Login = () => {
                                 </span>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    name="password"
+                                    name="loginPassword"
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
+                                    autoComplete="new-password"
                                     className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition"
                                     placeholder="Enter your password"
                                 />

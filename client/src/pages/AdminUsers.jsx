@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { deleteAdminUser, getAdminUsers, updateAdminUserRole } from '../services/api';
 
+const getSubscriptionStatus = (user) => {
+  if (user?.subscription?.isActive) {
+    return { label: 'Premium User', className: 'bg-green-100 text-green-700' };
+  }
+
+  if (user?.subscriptionStatus === 'premium') {
+    return { label: 'Premium User', className: 'bg-green-100 text-green-700' };
+  }
+
+  return { label: 'Free User', className: 'bg-gray-100 text-gray-700' };
+};
+
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +72,7 @@ const AdminUsers = () => {
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Subscription</th>
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Actions</th>
             </tr>
@@ -69,6 +82,11 @@ const AdminUsers = () => {
               <tr key={user._id} className="border-t border-gray-200">
                 <td className="px-4 py-3 font-medium text-gray-900">{user.name}</td>
                 <td className="px-4 py-3 text-gray-700">{user.email}</td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getSubscriptionStatus(user).className}`}>
+                    {getSubscriptionStatus(user).label}
+                  </span>
+                </td>
                 <td className="px-4 py-3 capitalize text-gray-700">{user.role}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
