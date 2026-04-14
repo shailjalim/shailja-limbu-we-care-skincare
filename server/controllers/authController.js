@@ -10,7 +10,10 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { sendEmail, generateResetPasswordEmail } = require('../utils/sendEmail');
+const {
+    sendPasswordResetEmail,
+    sendWelcomeEmail,
+} = require('../utils/emailService');
 
 /**
  * Generate JWT Token
@@ -117,6 +120,12 @@ const registerUser = async (req, res) => {
             password,
             role: requestedRole,
         });
+
+        try {
+            await sendWelcomeEmail(user.email, user.name);
+        } catch (emailError) {
+            console.error('Welcome email failed:', emailError.message);
+        }
 
         // ============ GENERATE TOKEN & RESPOND ============
 
@@ -330,49 +339,27 @@ const forgotPassword = async (req, res) => {
         // Save user with reset token (skip validation)
         await user.save({ validateBeforeSave: false });
 
-        // ============ CREATE RESET URL ============
-
-        // Frontend reset password page URL
-        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
-
         // ============ SEND EMAIL ============
 
         try {
-            const htmlMessage = generateResetPasswordEmail(user.name, resetUrl);
+            await sendPasswordResetEmail(user.email, resetToken, user.name);
 
-            const emailResult = await sendEmail({
-                email: user.email,
-                subject: 'WeCare - Password Reset Request',
-                message: `You requested a password reset. Please go to: ${resetUrl}`,
-                html: htmlMessage,
+            return res.status(200).json({
+                success: true,
+                message: 'If an account exists with this email, a password reset link has been sent',
             });
 
-            // Include preview URL for test emails (Ethereal)
-            const responseData = {
-                success: true,
-                message: 'Password reset email sent successfully',
-            };
-
-            if (emailResult.previewUrl) {
-                responseData.previewUrl = emailResult.previewUrl;
-                console.log('📧 Email preview:', emailResult.previewUrl);
-            }
-
-            res.status(200).json(responseData);
-
         } catch (emailError) {
-            // Log email error for debugging
-            console.error('Email Error:', emailError.message);
+            console.error('Password reset email failed:', emailError.message);
             
             // If email fails, clear reset token from database
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save({ validateBeforeSave: false });
 
-            return res.status(500).json({
-                success: false,
-                error: process.env.NODE_ENV === 'development' ? emailError.message : undefined,
-                message: 'Email could not be sent. Please try again later.',
+            return res.status(200).json({
+                success: true,
+                message: 'If an account exists with this email, a password reset link has been sent',
             });
         }
 

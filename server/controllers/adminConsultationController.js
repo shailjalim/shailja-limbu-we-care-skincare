@@ -1,6 +1,7 @@
 const Consultation = require('../models/Consultation');
 const fs = require('fs');
 const path = require('path');
+const { sendConsultationReplyEmail } = require('../utils/emailService');
 
 const VALID_STATUSES = new Set(['pending', 'in-progress', 'completed']);
 
@@ -89,6 +90,8 @@ exports.updateAdminConsultation = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Consultation not found' });
     }
 
+    const previousStatus = consultation.status || 'pending';
+
     if (req.body.status !== undefined) {
       const nextStatus = toModelStatus(req.body.status);
       if (!nextStatus) {
@@ -114,6 +117,18 @@ exports.updateAdminConsultation = async (req, res) => {
     }
 
     await consultation.save();
+
+    const isCompletedTransition = previousStatus !== 'completed' && consultation.status === 'completed';
+    const hasReply = typeof consultation.adminReply === 'string' && consultation.adminReply.trim().length > 0;
+    const recipientEmail = consultation.userId?.email || consultation.user?.email;
+
+    if (isCompletedTransition && hasReply && recipientEmail) {
+      try {
+        await sendConsultationReplyEmail(recipientEmail, consultation.title, consultation.adminReply);
+      } catch (emailError) {
+        console.error('Consultation reply email failed:', emailError.message);
+      }
+    }
 
     return res.status(200).json({ success: true, consultation: formatConsultation(consultation) });
   } catch (error) {
