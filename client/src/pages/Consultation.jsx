@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getMyConsultations, requestConsultation } from '../services/api';
 
 const MAX_IMAGE_COUNT = 3;
@@ -29,6 +29,7 @@ const Consultation = () => {
     const [description, setDescription] = useState('');
     const [selectedImages, setSelectedImages] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
+    const imageInputRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -83,6 +84,26 @@ const Consultation = () => {
         setPreviewUrls(nextPreviewUrls);
     };
 
+    const clearSelectedImages = () => {
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+        setSelectedImages([]);
+        setPreviewUrls([]);
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
+    };
+
+    const removeSelectedImage = (indexToRemove) => {
+        URL.revokeObjectURL(previewUrls[indexToRemove]);
+        const nextImages = selectedImages.filter((_, index) => index !== indexToRemove);
+        const nextPreviewUrls = previewUrls.filter((_, index) => index !== indexToRemove);
+        setSelectedImages(nextImages);
+        setPreviewUrls(nextPreviewUrls);
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -106,9 +127,7 @@ const Consultation = () => {
 
             setTitle('');
             setDescription('');
-            setSelectedImages([]);
-            previewUrls.forEach((url) => URL.revokeObjectURL(url));
-            setPreviewUrls([]);
+            clearSelectedImages();
             setMessage('Consultation requested successfully.');
             await loadConsultations();
         } catch (err) {
@@ -156,6 +175,7 @@ const Consultation = () => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Images (optional, up to 3)</label>
                             <input
+                                ref={imageInputRef}
                                 type="file"
                                 accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                                 multiple
@@ -163,16 +183,36 @@ const Consultation = () => {
                                 className="w-full rounded-3xl border border-gray-200 px-4 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-pink-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-pink-700 hover:file:bg-pink-100"
                             />
                             {previewUrls.length > 0 && (
-                                <div className="mt-3 grid grid-cols-3 gap-3">
-                                    {previewUrls.map((url, index) => (
-                                        <img
-                                            key={`${url}-${index}`}
-                                            src={url}
-                                            alt={`Selected preview ${index + 1}`}
-                                            className="h-20 w-full rounded-xl border border-gray-200 object-cover"
-                                        />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="mt-2 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={clearSelectedImages}
+                                            className="rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Cancel selected images
+                                        </button>
+                                    </div>
+                                    <div className="mt-3 grid grid-cols-3 gap-3">
+                                        {previewUrls.map((url, index) => (
+                                            <div key={`${url}-${index}`} className="relative">
+                                                <img
+                                                    src={url}
+                                                    alt={`Selected preview ${index + 1}`}
+                                                    className="h-20 w-full rounded-xl border border-gray-200 object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSelectedImage(index)}
+                                                    className="absolute right-1 top-1 rounded-full bg-white/95 px-2 py-0.5 text-xs font-semibold text-red-600 shadow-sm hover:bg-white"
+                                                    aria-label={`Remove selected image ${index + 1}`}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
                             )}
                         </div>
                         <button type="submit" className="w-full rounded-3xl bg-pink-600 px-6 py-3 text-white font-medium hover:bg-pink-700 transition">

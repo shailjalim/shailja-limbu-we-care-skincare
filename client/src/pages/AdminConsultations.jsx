@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AdminModal from '../components/admin/AdminModal';
 import {
   deleteAdminConsultation,
@@ -29,6 +29,7 @@ const AdminConsultations = () => {
   const [adminReply, setAdminReply] = useState('');
   const [replyImages, setReplyImages] = useState([]);
   const [replyPreviewUrls, setReplyPreviewUrls] = useState([]);
+  const replyImageInputRef = useRef(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const loadConsultations = async () => {
@@ -52,10 +53,17 @@ const AdminConsultations = () => {
     setActiveConsultation(item);
     setStatus(item.status || 'pending');
     setAdminReply(item.adminReply || '');
-    setReplyImages([]);
-    replyPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    setReplyPreviewUrls([]);
+    clearReplyImages();
     setIsModalOpen(true);
+  };
+
+  const clearReplyImages = () => {
+    replyPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setReplyImages([]);
+    setReplyPreviewUrls([]);
+    if (replyImageInputRef.current) {
+      replyImageInputRef.current.value = '';
+    }
   };
 
   const handleReplyImagesChange = (e) => {
@@ -81,6 +89,17 @@ const AdminConsultations = () => {
     setReplyPreviewUrls(previews);
   };
 
+  const removeReplyImage = (indexToRemove) => {
+    URL.revokeObjectURL(replyPreviewUrls[indexToRemove]);
+    const nextImages = replyImages.filter((_, index) => index !== indexToRemove);
+    const nextPreviewUrls = replyPreviewUrls.filter((_, index) => index !== indexToRemove);
+    setReplyImages(nextImages);
+    setReplyPreviewUrls(nextPreviewUrls);
+    if (replyImageInputRef.current) {
+      replyImageInputRef.current.value = '';
+    }
+  };
+
   const openDetailsModal = (item) => {
     setActiveConsultation(item);
     setIsDetailsModalOpen(true);
@@ -93,9 +112,7 @@ const AdminConsultations = () => {
       await updateAdminConsultation(activeConsultation._id, { status, adminReply, replyImages });
       setMessage('Consultation updated successfully.');
       setIsModalOpen(false);
-      replyPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-      setReplyPreviewUrls([]);
-      setReplyImages([]);
+      clearReplyImages();
       await loadConsultations();
     } catch (err) {
       setError(err.message || 'Unable to update consultation');
@@ -187,11 +204,12 @@ const AdminConsultations = () => {
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Reply Images (optional, up to 3)</label>
             <input
+              ref={replyImageInputRef}
               type="file"
               accept=".jpg,.jpeg,.png,image/jpeg,image/png"
               multiple
               onChange={handleReplyImagesChange}
-              className="w-full rounded-xl border border-gray-300 px-4 py-3"
+              className="w-full rounded-3xl border border-gray-200 px-4 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-pink-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-pink-700 hover:file:bg-pink-100"
             />
             {Array.isArray(activeConsultation?.adminReplyImages) && activeConsultation.adminReplyImages.length > 0 && (
               <div className="mt-2">
@@ -205,10 +223,29 @@ const AdminConsultations = () => {
             )}
             {replyPreviewUrls.length > 0 && (
               <div className="mt-3">
+                <div className="mb-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={clearReplyImages}
+                    className="rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Cancel selected images
+                  </button>
+                </div>
                 <p className="text-xs text-gray-500 mb-2">New images to upload</p>
                 <div className="grid grid-cols-3 gap-2">
                   {replyPreviewUrls.map((url, index) => (
-                    <img key={`${url}-${index}`} src={url} alt={`Reply preview ${index + 1}`} className="h-16 w-full rounded-lg border border-gray-200 object-cover" />
+                    <div key={`${url}-${index}`} className="relative">
+                      <img src={url} alt={`Reply preview ${index + 1}`} className="h-16 w-full rounded-lg border border-gray-200 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeReplyImage(index)}
+                        className="absolute right-1 top-1 rounded-full bg-white/95 px-2 py-0.5 text-xs font-semibold text-red-600 shadow-sm hover:bg-white"
+                        aria-label={`Remove reply image ${index + 1}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
