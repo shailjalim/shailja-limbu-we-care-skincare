@@ -162,50 +162,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* TESTIMONIAL / COMMUNITY SECTION */}
-            <section className="w-full px-8 lg:px-20 py-16">
-                <div className="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-12 rounded-3xl shadow-xl">
-                    
-                    {/* Section Header */}
-                    <h2 className="text-center text-2xl md:text-3xl font-bold">
-                        Join Thousands of Happy Users
-                    </h2>
-                    <p className="text-center mt-2 text-pink-100 max-w-xl mx-auto">
-                        Our community has already transformed their skincare routines and seen amazing results.
-                    </p>
-
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mt-10">
-                        <div className="p-4">
-                            <h3 className="text-3xl lg:text-4xl font-bold">98%</h3>
-                            <p className="text-pink-100 text-sm mt-1">User Satisfaction</p>
-                        </div>
-                        <div className="p-4">
-                            <h3 className="text-3xl lg:text-4xl font-bold">50K+</h3>
-                            <p className="text-pink-100 text-sm mt-1">Active Users</p>
-                        </div>
-                        <div className="p-4">
-                            <h3 className="text-3xl lg:text-4xl font-bold">1M+</h3>
-                            <p className="text-pink-100 text-sm mt-1">Routines Created</p>
-                        </div>
-                        <div className="p-4">
-                            <h3 className="text-3xl lg:text-4xl font-bold">24/7</h3>
-                            <p className="text-pink-100 text-sm mt-1">Support</p>
-                        </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <div className="text-center mt-10">
-                        <Link 
-                            to="/register"
-                            className="inline-block bg-white text-pink-600 px-8 py-3 rounded-full font-semibold hover:bg-pink-50 transition duration-300 shadow-lg"
-                        >
-                            Get Started Today
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
             {/* FOOTER */}
             <footer className="w-full px-8 lg:px-20 py-10 bg-gray-50 border-t border-gray-200">
                 <div className="grid md:grid-cols-4 gap-8">
@@ -224,7 +180,6 @@ const Home = () => {
                             <li><Link to="/" className="hover:text-pink-600 transition">Home</Link></li>
                             <li><Link to="/features" className="hover:text-pink-600 transition">Features</Link></li>
                             <li><Link to="/quiz" className="hover:text-pink-600 transition">Take Quiz</Link></li>
-                            <li><Link to="/community" className="hover:text-pink-600 transition">Community</Link></li>
                         </ul>
                     </div>
 

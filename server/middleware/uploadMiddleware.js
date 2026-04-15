@@ -3,9 +3,14 @@ const path = require('path');
 const multer = require('multer');
 
 const uploadDirectory = path.join(__dirname, '..', 'uploads', 'consultations');
+const profileUploadDirectory = path.join(__dirname, '..', 'uploads', 'profiles');
 
 if (!fs.existsSync(uploadDirectory)) {
   fs.mkdirSync(uploadDirectory, { recursive: true });
+}
+
+if (!fs.existsSync(profileUploadDirectory)) {
+  fs.mkdirSync(profileUploadDirectory, { recursive: true });
 }
 
 const storage = multer.diskStorage({
@@ -44,6 +49,30 @@ const upload = multer({
   limits: {
     fileSize: 2 * 1024 * 1024,
     files: 3,
+  },
+});
+
+const profileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, profileUploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const baseName = path
+      .basename(file.originalname, extension)
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .slice(0, 50);
+
+    cb(null, `${Date.now()}-${baseName}${extension}`);
+  },
+});
+
+const profileUpload = multer({
+  storage: profileStorage,
+  fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024,
+    files: 1,
   },
 });
 
@@ -97,7 +126,33 @@ const uploadAdminReplyImages = (req, res, next) => {
   });
 };
 
+const uploadProfileImage = (req, res, next) => {
+  profileUpload.single('profileImage')(req, res, (err) => {
+    if (!err) {
+      return next();
+    }
+
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, message: 'Profile image must be 2MB or smaller' });
+      }
+
+      if (err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE') {
+        return res.status(400).json({ success: false, message: 'Only one profile image is allowed' });
+      }
+
+      return res.status(400).json({ success: false, message: 'Invalid profile image upload payload' });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: err.message || 'Profile image upload failed',
+    });
+  });
+};
+
 module.exports = {
   uploadConsultationImages,
   uploadAdminReplyImages,
+  uploadProfileImage,
 };

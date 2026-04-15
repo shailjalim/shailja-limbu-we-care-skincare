@@ -14,6 +14,12 @@ const {
     registerUser,
     loginUser,
     getCurrentUser,
+    getAccountProfile,
+    updateAccountProfile,
+    changeAccountPassword,
+    uploadProfileImage,
+    removeProfileImage,
+    deactivateAccount,
     getAdminRegistrationStatus,
     forgotPassword,
     resetPassword,
@@ -21,6 +27,7 @@ const {
 
 // Import auth middleware
 const { protect } = require('../middleware/authMiddleware');
+const { uploadProfileImage: uploadProfileImageMiddleware } = require('../middleware/uploadMiddleware');
 
 /**
  * @route   POST /api/auth/register
@@ -49,6 +56,48 @@ router.get('/admin-status', getAdminRegistrationStatus);
  * @access  Private
  */
 router.get('/me', protect, getCurrentUser);
+
+/**
+ * @route   GET /api/auth/account
+ * @desc    Get current account profile details
+ * @access  Private
+ */
+router.get('/account', protect, getAccountProfile);
+
+/**
+ * @route   PATCH /api/auth/account
+ * @desc    Update basic account information
+ * @access  Private
+ */
+router.patch('/account', protect, updateAccountProfile);
+
+/**
+ * @route   PATCH /api/auth/account/password
+ * @desc    Change account password
+ * @access  Private
+ */
+router.patch('/account/password', protect, changeAccountPassword);
+
+/**
+ * @route   PATCH /api/auth/account/profile-image
+ * @desc    Upload or replace profile image
+ * @access  Private
+ */
+router.patch('/account/profile-image', protect, uploadProfileImageMiddleware, uploadProfileImage);
+
+/**
+ * @route   DELETE /api/auth/account/profile-image
+ * @desc    Remove profile image
+ * @access  Private
+ */
+router.delete('/account/profile-image', protect, removeProfileImage);
+
+/**
+ * @route   DELETE /api/auth/account
+ * @desc    Soft delete account (deactivate)
+ * @access  Private
+ */
+router.delete('/account', protect, deactivateAccount);
 
 /**
  * @route   POST /api/auth/forgot-password

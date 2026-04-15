@@ -8,10 +8,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { logout, getUser, isAuthenticated } from '../services/api';
+import { logout, getUser, isAuthenticated, resolveImageUrl } from '../services/api';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [user, setUser] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     
@@ -32,6 +33,7 @@ const Navbar = () => {
         };
         
         checkAuth();
+        setIsProfileMenuOpen(false);
         window.addEventListener('storage', checkAuth);
         return () => window.removeEventListener('storage', checkAuth);
     }, [location]);
@@ -41,6 +43,7 @@ const Navbar = () => {
         setUser(null);
         setIsLoggedIn(false);
         setIsMobileMenuOpen(false);
+        setIsProfileMenuOpen(false);
         navigate('/');
     };
 
@@ -109,25 +112,48 @@ const Navbar = () => {
             {/* Auth Buttons - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
                 {isLoggedIn ? (
-                    <>
-                        <Link 
-                            to={isAdmin ? '/admin' : '/dashboard'}
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
                             className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition"
                         >
-                            <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
-                                <span className="text-pink-600 font-semibold text-sm">
-                                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                </span>
+                            <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center overflow-hidden">
+                                {user?.profileImage ? (
+                                    <img
+                                        src={resolveImageUrl(user.profileImage)}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-pink-600 font-semibold text-sm">
+                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </span>
+                                )}
                             </div>
                             <span className="font-medium">{user?.name || 'User'}</span>
-                        </Link>
-                        <button 
-                            onClick={handleLogout}
-                            className="px-5 py-2 border-2 border-pink-600 text-pink-600 rounded-full hover:bg-pink-600 hover:text-white transition duration-200"
-                        >
-                            Logout
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
-                    </>
+
+                        {isProfileMenuOpen && (
+                            <div className="absolute right-0 mt-3 w-44 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50">
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setIsProfileMenuOpen(false)}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-700"
+                                >
+                                    Profile
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-700"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <>
                         <Link 
@@ -185,23 +211,36 @@ const Navbar = () => {
                         {isLoggedIn ? (
                             <>
                                 <li className="px-8 py-3 border-t border-gray-100">
-                                    <Link 
-                                        to={isAdmin ? '/admin' : '/dashboard'}
-                                        className="flex items-center space-x-3 text-gray-700"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                    >
+                                    <div className="flex items-center space-x-3 text-gray-700">
                                         <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                                            <span className="text-pink-600 font-semibold">
-                                                {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                            </span>
+                                            {user?.profileImage ? (
+                                                <img
+                                                    src={resolveImageUrl(user.profileImage)}
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover rounded-full"
+                                                />
+                                            ) : (
+                                                <span className="text-pink-600 font-semibold">
+                                                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                                </span>
+                                            )}
                                         </div>
                                         <div>
                                             <p className="font-medium">{user?.name || 'User'}</p>
                                             <p className="text-sm text-gray-500">{user?.email || ''}</p>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </li>
                                 <li className="px-8 py-3">
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="block w-full text-center px-6 py-2 border-2 border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition"
+                                    >
+                                        Profile
+                                    </Link>
+                                </li>
+                                <li className="px-8 py-2">
                                     <button 
                                         onClick={handleLogout}
                                         className="block w-full text-center px-6 py-2 border-2 border-pink-600 text-pink-600 rounded-full hover:bg-pink-600 hover:text-white transition"

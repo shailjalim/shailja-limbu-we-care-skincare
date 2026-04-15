@@ -61,6 +61,13 @@ const protect = async (req, res, next) => {
                 });
             }
 
+            if (user.isActive === false) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'This account has been deactivated. Please contact support if you need help.',
+                });
+            }
+
             // Attach user to request object for use in route handlers
             req.user = user;
 

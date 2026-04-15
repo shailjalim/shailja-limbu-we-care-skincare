@@ -37,6 +37,7 @@ import RoutineTracker from './pages/RoutineTracker';
 import Chatbot from './pages/Chatbot';
 import Subscription from './pages/Subscription';
 import Consultation from './pages/Consultation';
+import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
@@ -201,6 +202,16 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Chatbot />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* User Profile - Requires Authentication */}
+                    <Route
+                        path="/profile"
+                        element={
+                            <PrivateRoute>
+                                <Profile />
                             </PrivateRoute>
                         }
                     />

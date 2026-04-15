@@ -44,6 +44,19 @@ const apiClient = axios.create({
     timeout: 10000, // 10 seconds timeout
 });
 
+export const resolveImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
+
+    const apiBase = process.env.REACT_APP_API_URL || '';
+    if (/^https?:\/\//i.test(apiBase)) {
+        const apiOrigin = apiBase.replace(/\/api\/?$/, '');
+        return `${apiOrigin}${imagePath}`;
+    }
+
+    return imagePath;
+};
+
 // ================== TOKEN MANAGEMENT ==================
 
 /**
@@ -253,6 +266,78 @@ export const logout = () => {
 export const getCurrentUser = async () => {
     try {
         const response = await apiClient.get('/auth/me');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAccountProfile = async () => {
+    try {
+        const response = await apiClient.get('/auth/account');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateAccountProfile = async ({ name }) => {
+    try {
+        const response = await apiClient.patch('/auth/account', { name });
+        if (response.success && response.user) {
+            setStoredUser({ ...(getUser() || {}), ...response.user });
+        }
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const changeAccountPassword = async ({ currentPassword, newPassword }) => {
+    try {
+        const response = await apiClient.patch('/auth/account/password', { currentPassword, newPassword });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const uploadAccountProfileImage = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('profileImage', file);
+
+        const response = await apiClient.patch('/auth/account/profile-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        if (response.success && response.profileImage) {
+            setStoredUser({ ...(getUser() || {}), profileImage: response.profileImage });
+        }
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const removeAccountProfileImage = async () => {
+    try {
+        const response = await apiClient.delete('/auth/account/profile-image');
+        if (response.success) {
+            setStoredUser({ ...(getUser() || {}), profileImage: null });
+        }
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deactivateAccount = async () => {
+    try {
+        const response = await apiClient.delete('/auth/account');
         return response;
     } catch (error) {
         throw error;

@@ -10,10 +10,33 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const {
     sendPasswordResetEmail,
     sendWelcomeEmail,
 } = require('../utils/emailService');
+
+const MAX_NAME_LENGTH = 50;
+
+const sanitizeName = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+
+const deleteLocalUpload = (relativePath) => {
+    if (!relativePath || typeof relativePath !== 'string' || !relativePath.startsWith('/uploads/')) {
+        return;
+    }
+
+    const cleanedRelativePath = relativePath.replace(/^\/uploads\/?/, '');
+    const absolutePath = path.join(__dirname, '..', 'uploads', cleanedRelativePath);
+
+    try {
+        if (fs.existsSync(absolutePath)) {
+            fs.unlinkSync(absolutePath);
+        }
+    } catch (error) {
+        console.warn('Failed to remove local upload:', error.message);
+    }
+};
 
 /**
  * Generate JWT Token
@@ -44,6 +67,8 @@ const formatUserResponse = (user, token) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileImage: user.profileImage || null,
+        isActive: user.isActive !== false,
         createdAt: user.createdAt,
         token,
     };
@@ -200,6 +225,13 @@ const loginUser = async (req, res) => {
             });
         }
 
+        if (user.isActive === false) {
+            return res.status(403).json({
+                success: false,
+                message: 'This account has been deactivated. Please contact support if you need help.',
+            });
+        }
+
         // ============ VERIFY PASSWORD ============
 
         const isPasswordMatch = await user.matchPassword(password);
@@ -258,6 +290,8 @@ const getCurrentUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                profileImage: user.profileImage || null,
+                isActive: user.isActive !== false,
                 createdAt: user.createdAt,
             },
         });
@@ -266,6 +300,283 @@ const getCurrentUser = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Get Account Profile
+ *
+ * @route   GET /api/auth/account
+ * @desc    Get current account profile details
+ * @access  Private
+ */
+const getAccountProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                profileImage: user.profileImage || null,
+                isActive: user.isActive !== false,
+                createdAt: user.createdAt,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while retrieving account profile',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Update Basic Account Profile
+ *
+ * @route   PATCH /api/auth/account
+ * @desc    Update editable account fields (full name)
+ * @access  Private
+ */
+const updateAccountProfile = async (req, res) => {
+    try {
+        const name = sanitizeName(req.body?.name);
+
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Full name is required',
+            });
+        }
+
+        if (name.length > MAX_NAME_LENGTH) {
+            return res.status(400).json({
+                success: false,
+                message: `Full name cannot exceed ${MAX_NAME_LENGTH} characters`,
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        user.name = name;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Account profile updated successfully',
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                profileImage: user.profileImage || null,
+                isActive: user.isActive !== false,
+                createdAt: user.createdAt,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while updating account profile',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Change Account Password
+ *
+ * @route   PATCH /api/auth/account/password
+ * @desc    Change password using current password verification
+ * @access  Private
+ */
+const changeAccountPassword = async (req, res) => {
+    try {
+        const currentPassword = String(req.body?.currentPassword || '');
+        const newPassword = String(req.body?.newPassword || '');
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current password and new password are required',
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters long',
+            });
+        }
+
+        const user = await User.findById(req.user.id).select('+password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        const isCurrentPasswordValid = await user.matchPassword(currentPassword);
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current password is incorrect',
+            });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password changed successfully',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while changing password',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Upload or Change Profile Image
+ *
+ * @route   PATCH /api/auth/account/profile-image
+ * @desc    Upload a profile image and replace previous one if exists
+ * @access  Private
+ */
+const uploadProfileImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Profile image file is required',
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        const previousImage = user.profileImage;
+        user.profileImage = `/uploads/profiles/${req.file.filename}`;
+        await user.save();
+
+        if (previousImage && previousImage !== user.profileImage) {
+            deleteLocalUpload(previousImage);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile image updated successfully',
+            profileImage: user.profileImage,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while updating profile image',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Remove Profile Image
+ *
+ * @route   DELETE /api/auth/account/profile-image
+ * @desc    Remove current profile image
+ * @access  Private
+ */
+const removeProfileImage = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        const previousImage = user.profileImage;
+        user.profileImage = null;
+        await user.save();
+
+        deleteLocalUpload(previousImage);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile image removed successfully',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while removing profile image',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+};
+
+/**
+ * Deactivate Account
+ *
+ * @route   DELETE /api/auth/account
+ * @desc    Soft-delete account by deactivating user login access
+ * @access  Private
+ */
+const deactivateAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        user.isActive = false;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Account deactivated successfully',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while deactivating account',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }
@@ -454,6 +765,12 @@ module.exports = {
     registerUser,
     loginUser,
     getCurrentUser,
+    getAccountProfile,
+    updateAccountProfile,
+    changeAccountPassword,
+    uploadProfileImage,
+    removeProfileImage,
+    deactivateAccount,
     getAdminRegistrationStatus,
     forgotPassword,
     resetPassword,
