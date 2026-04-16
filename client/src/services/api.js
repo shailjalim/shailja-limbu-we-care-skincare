@@ -628,6 +628,30 @@ export const cancelSubscription = async (subscriptionId) => {
     }
 };
 
+export const initiateEsewaPayment = async (plan) => {
+    try {
+        const response = await apiClient.post('/payment/initiate-esewa', { plan });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const verifyEsewaPayment = async ({ data, pid, amount, refId, plan }) => {
+    try {
+        const response = await apiClient.post('/payment/verify-esewa', {
+            data,
+            pid,
+            amount,
+            refId,
+            plan,
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // ================== CONSULTATION API ==================
 
 export const requestConsultation = async (consultationData) => {

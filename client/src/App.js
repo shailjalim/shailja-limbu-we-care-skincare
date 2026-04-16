@@ -38,6 +38,8 @@ import Chatbot from './pages/Chatbot';
 import Subscription from './pages/Subscription';
 import Consultation from './pages/Consultation';
 import Profile from './pages/Profile';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailure from './pages/PaymentFailure';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminUsers from './pages/AdminUsers';
@@ -182,6 +184,24 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Subscription />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/payment-success"
+                        element={
+                            <PrivateRoute>
+                                <PaymentSuccess />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/payment-failure"
+                        element={
+                            <PrivateRoute>
+                                <PaymentFailure />
                             </PrivateRoute>
                         }
                     />

@@ -46,3 +46,10 @@ EMAIL_ALLOW_SELF_SIGNED=false
 
 # Frontend URL used in email links
 FRONTEND_URL=http://localhost:3000
+
+# eSewa Sandbox (v2)
+ESEWA_MERCHANT_ID=EPAYTEST
+# Sandbox secret key from eSewa test credentials.
+ESEWA_SECRET_KEY=8gBm/:&EnhH.1/q
+ESEWA_PAYMENT_URL=https://rc-epay.esewa.com.np/api/epay/main/v2/form
+ESEWA_VERIFY_URL=https://rc.esewa.com.np/api/epay/transaction/status/

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { activateSubscription, getSubscriptionStatus } from '../services/api';
+import { activateSubscription, getSubscriptionStatus, initiateEsewaPayment } from '../services/api';
 
 const PLAN_OPTIONS = [
     { value: 'monthly', label: 'Monthly', days: 30 },
@@ -8,6 +8,11 @@ const PLAN_OPTIONS = [
 ];
 
 const PAYMENT_METHODS = ['eSewa', 'Khalti', 'Card'];
+const PLAN_AMOUNTS = {
+    monthly: 12,
+    'half-yearly': 60,
+    yearly: 120,
+};
 
 const Subscription = () => {
     const [subscriptionStatus, setSubscriptionStatus] = useState(null);
@@ -39,11 +44,56 @@ const Subscription = () => {
         loadSubscriptionStatus();
     }, []);
 
+    const handleEsewaPayment = async (selectedPlan, selectedAmount) => {
+        const pid = `order_${Date.now()}`;
+        const response = await initiateEsewaPayment(selectedPlan);
+
+        const payload = response?.payload || {};
+        if (!response?.paymentUrl) {
+            throw new Error('eSewa payment URL is not configured. Please contact support.');
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = response.paymentUrl;
+
+        const fields = {
+            amount: payload.amount ?? selectedAmount,
+            tax_amount: payload.tax_amount ?? 0,
+            total_amount: payload.total_amount ?? selectedAmount,
+            transaction_uuid: payload.transaction_uuid || pid,
+            product_code: payload.product_code || payload.scd || 'EPAYTEST',
+            product_service_charge: payload.product_service_charge ?? payload.psc ?? 0,
+            product_delivery_charge: payload.product_delivery_charge ?? payload.pdc ?? 0,
+            success_url: payload.success_url || payload.su || 'http://localhost:3000/payment-success',
+            failure_url: payload.failure_url || payload.fu || 'http://localhost:3000/payment-failure',
+            signed_field_names: payload.signed_field_names,
+            signature: payload.signature,
+        };
+
+        Object.entries(fields).forEach(([key, value]) => {
+            if (value === undefined || value === null || value === '') return;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+    };
+
     const handleActivate = async (paymentMethod) => {
         setError('');
         setMessage('');
         setActivating(true);
         try {
+            if (paymentMethod === 'eSewa') {
+                await handleEsewaPayment(plan, PLAN_AMOUNTS[plan]);
+                return;
+            }
             await activateSubscription(plan, paymentMethod);
             setMessage('Subscription activated successfully.');
             await loadSubscriptionStatus();
@@ -115,7 +165,7 @@ const Subscription = () => {
                         </div>
 
                         <div>
-                            <p className="block text-sm font-medium text-gray-700 mb-2">Simulated Payment</p>
+                            <p className="block text-sm font-medium text-gray-700 mb-2">Payment Methods</p>
                             <div className="grid gap-3 sm:grid-cols-3">
                                 {PAYMENT_METHODS.map((method) => (
                                     <button
@@ -132,7 +182,7 @@ const Subscription = () => {
                         </div>
                     </div>
                     <div className="mt-6 rounded-3xl bg-pink-50 p-4 text-sm text-pink-700">
-                        This is a simulated payment flow. Choosing a payment method activates the selected plan instantly.
+                        eSewa uses gateway verification. Other methods currently use simulated activation.
                     </div>
                 </div>
             </div>
