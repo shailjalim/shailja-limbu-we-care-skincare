@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../services/api';
 
@@ -9,13 +9,10 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const loadProducts = async () => {
+    const runSearch = useCallback(async (params = {}) => {
         setLoading(true);
         setError('');
         try {
-            const params = {};
-            if (search) params.search = search;
-            if (ingredient) params.ingredient = ingredient;
             const response = await getProducts(params);
             setProducts(response);
         } catch (err) {
@@ -23,15 +20,18 @@ const ProductList = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        loadProducts();
-    }, []);
+        runSearch({});
+    }, [runSearch]);
 
     const handleSearch = async (e) => {
         e.preventDefault();
-        await loadProducts();
+        const params = {};
+        if (search) params.search = search;
+        if (ingredient) params.ingredient = ingredient;
+        await runSearch(params);
     };
 
     return (

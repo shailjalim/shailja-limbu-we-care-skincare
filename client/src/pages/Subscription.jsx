@@ -48,8 +48,14 @@ const Subscription = () => {
         const response = await initiateEsewaPayment(selectedPlan);
 
         const payload = response?.payload || {};
+        const successUrl = payload.success_url || payload.su;
+        const failureUrl = payload.failure_url || payload.fu;
         if (!response?.paymentUrl) {
             throw new Error('eSewa payment URL is not configured. Please contact support.');
+        }
+
+        if (!successUrl || !failureUrl) {
+            throw new Error('eSewa callback URLs are missing. Please contact support.');
         }
 
         const form = document.createElement('form');
@@ -64,8 +70,8 @@ const Subscription = () => {
             product_code: payload.product_code || payload.scd || 'EPAYTEST',
             product_service_charge: payload.product_service_charge ?? payload.psc ?? 0,
             product_delivery_charge: payload.product_delivery_charge ?? payload.pdc ?? 0,
-            success_url: payload.success_url || payload.su || 'http://localhost:3000/payment-success',
-            failure_url: payload.failure_url || payload.fu || 'http://localhost:3000/payment-failure',
+            success_url: successUrl,
+            failure_url: failureUrl,
             signed_field_names: payload.signed_field_names,
             signature: payload.signature,
         };

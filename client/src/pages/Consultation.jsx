@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getMyConsultations, requestConsultation } from '../services/api';
+import { getMyConsultations, requestConsultation, resolveImageUrl } from '../services/api';
 
 const MAX_IMAGE_COUNT = 3;
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
@@ -9,18 +9,6 @@ const getStatusBadgeClasses = (status) => {
     if (status === 'completed') return 'bg-green-100 text-green-700';
     if (status === 'in-progress') return 'bg-blue-100 text-blue-700';
     return 'bg-yellow-100 text-yellow-700';
-};
-
-const resolveImageUrl = (imagePath) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return imagePath;
-
-    const configuredApiUrl = process.env.REACT_APP_API_URL;
-    if (configuredApiUrl && configuredApiUrl.startsWith('http')) {
-        return `${configuredApiUrl.replace(/\/?api\/?$/, '')}${imagePath}`;
-    }
-
-    return `http://localhost:5000${imagePath}`;
 };
 
 const Consultation = () => {

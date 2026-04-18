@@ -3,20 +3,9 @@ import AdminModal from '../components/admin/AdminModal';
 import {
   deleteAdminConsultation,
   getAdminConsultations,
+  resolveImageUrl,
   updateAdminConsultation,
 } from '../services/api';
-
-const resolveImageUrl = (imagePath) => {
-  if (!imagePath) return '';
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return imagePath;
-
-  const configuredApiUrl = process.env.REACT_APP_API_URL;
-  if (configuredApiUrl && configuredApiUrl.startsWith('http')) {
-    return `${configuredApiUrl.replace(/\/?api\/?$/, '')}${imagePath}`;
-  }
-
-  return `http://localhost:5000${imagePath}`;
-};
 
 const AdminConsultations = () => {
   const [consultations, setConsultations] = useState([]);

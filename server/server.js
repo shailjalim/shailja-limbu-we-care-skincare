@@ -42,6 +42,15 @@ const app = express();
 
 // Define the port (from .env or default to 5000)
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === 'production';
+const configuredOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+const defaultDevOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = isProduction
+    ? configuredOrigins
+    : Array.from(new Set([...defaultDevOrigins, ...configuredOrigins]));
 
 // ================== MIDDLEWARE ==================
 
@@ -51,7 +60,18 @@ const PORT = process.env.PORT || 5000;
  * Allows frontend to communicate with backend
  */
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: (origin, callback) => {
+        // Allow non-browser or same-origin requests without Origin header.
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

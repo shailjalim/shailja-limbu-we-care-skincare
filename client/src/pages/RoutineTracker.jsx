@@ -16,7 +16,6 @@ const RoutineTracker = () => {
     const location = useLocation();
     const [routines, setRoutines] = useState([]);
     const [products, setProducts] = useState([]);
-    const [productCategories, setProductCategories] = useState([]);
     const [routineType, setRoutineType] = useState('morning');
     const [selectedProducts, setSelectedProducts] = useState({});
     const [selectedRoutineId, setSelectedRoutineId] = useState(null);
@@ -50,8 +49,6 @@ const RoutineTracker = () => {
             const response = await getAllProducts();
             const allProducts = Array.isArray(response) ? response : response.products || [];
             setProducts(allProducts);
-            const categories = Array.from(new Set(allProducts.map((p) => p.category || 'General')));
-            setProductCategories(categories);
             console.log('Products loaded:', allProducts.length);
         } catch (err) {
             console.warn('Unable to load products', err);

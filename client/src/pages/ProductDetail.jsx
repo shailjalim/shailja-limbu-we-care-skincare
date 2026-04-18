@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProductById, getProductReviews, submitProductReview } from '../services/api';
 
@@ -14,7 +14,7 @@ const ProductDetail = () => {
     const [error, setError] = useState('');
     const [submitMessage, setSubmitMessage] = useState('');
 
-    const loadProduct = async () => {
+    const loadProduct = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
@@ -28,11 +28,11 @@ const ProductDetail = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     useEffect(() => {
         loadProduct();
-    }, [id]);
+    }, [loadProduct]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
