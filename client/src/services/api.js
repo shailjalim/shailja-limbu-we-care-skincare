@@ -408,7 +408,7 @@ export const getSkinProfile = async () => {
 /**
  * Create or update skin profile
  * 
- * @param {Object} profileData - { skinType, concerns, allergies, goals }
+ * @param {Object} profileData - { skinType, concerns, allergies }
  * @returns {Promise<Object>} - Updated profile data
  */
 export const updateSkinProfile = async (profileData) => {
@@ -588,9 +588,9 @@ export const deleteRoutine = async (routineId) => {
 
 // ================== SUBSCRIPTION API ==================
 
-export const activateSubscription = async (plan, paymentMethod = 'simulation') => {
+export const activateSubscription = async (plan) => {
     try {
-        const response = await apiClient.post('/subscription/activate', { plan, paymentMethod });
+        const response = await apiClient.post('/subscription/activate', { plan, paymentMethod: 'eSewa' });
         return response;
     } catch (error) {
         throw error;
@@ -615,8 +615,8 @@ export const getCurrentSubscription = async () => {
     }
 };
 
-export const subscribeToPlan = async (plan, paymentMethod) => {
-    return activateSubscription(plan, paymentMethod);
+export const subscribeToPlan = async (plan) => {
+    return activateSubscription(plan);
 };
 
 export const cancelSubscription = async (subscriptionId) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { activateSubscription, getSubscriptionStatus, initiateEsewaPayment } from '../services/api';
+import { getSubscriptionStatus, initiateEsewaPayment } from '../services/api';
 
 const PLAN_OPTIONS = [
     { value: 'monthly', label: 'Monthly', days: 30 },
@@ -7,7 +7,6 @@ const PLAN_OPTIONS = [
     { value: 'yearly', label: 'Yearly', days: 365 },
 ];
 
-const PAYMENT_METHODS = ['eSewa', 'Khalti', 'Card'];
 const PLAN_AMOUNTS = {
     monthly: 12,
     'half-yearly': 60,
@@ -85,18 +84,12 @@ const Subscription = () => {
         form.remove();
     };
 
-    const handleActivate = async (paymentMethod) => {
+    const handleActivate = async () => {
         setError('');
         setMessage('');
         setActivating(true);
         try {
-            if (paymentMethod === 'eSewa') {
-                await handleEsewaPayment(plan, PLAN_AMOUNTS[plan]);
-                return;
-            }
-            await activateSubscription(plan, paymentMethod);
-            setMessage('Subscription activated successfully.');
-            await loadSubscriptionStatus();
+            await handleEsewaPayment(plan, PLAN_AMOUNTS[plan]);
         } catch (err) {
             setError(err.message || 'Unable to activate subscription');
         } finally {
@@ -164,25 +157,17 @@ const Subscription = () => {
                             </select>
                         </div>
 
-                        <div>
-                            <p className="block text-sm font-medium text-gray-700 mb-2">Payment Methods</p>
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                {PAYMENT_METHODS.map((method) => (
-                                    <button
-                                        key={method}
-                                        type="button"
-                                        onClick={() => handleActivate(method)}
-                                        disabled={activating}
-                                        className="rounded-3xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-pink-50 hover:border-pink-300 disabled:opacity-60"
-                                    >
-                                        Pay with {method}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={handleActivate}
+                            disabled={activating}
+                            className="w-full rounded-3xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-pink-50 hover:border-pink-300 disabled:opacity-60"
+                        >
+                            {activating ? 'Redirecting to eSewa...' : 'Pay with eSewa'}
+                        </button>
                     </div>
                     <div className="mt-6 rounded-3xl bg-pink-50 p-4 text-sm text-pink-700">
-                        eSewa uses gateway verification. Other methods currently use simulated activation.
+                        eSewa gateway verification is required to activate premium subscription.
                     </div>
                 </div>
             </div>

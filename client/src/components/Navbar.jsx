@@ -50,10 +50,7 @@ const Navbar = () => {
     // Public navigation links (shown when logged out)
     const publicNavLinks = [
         { name: 'Home', path: '/' },
-        { name: 'Products', path: '/products' },
-        { name: 'Content', path: '/content' },
         { name: 'Features', path: '/features' },
-        { name: 'Community', path: '/community' },
         { name: 'Contact', path: '/contact' },
     ];
 

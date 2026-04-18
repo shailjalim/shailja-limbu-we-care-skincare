@@ -85,7 +85,6 @@ const ProductList = () => {
                             <h2 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h2>
                             <p className="text-sm text-gray-500 mb-4 line-clamp-3">{product.description}</p>
                             <div className="flex items-center justify-between text-sm text-gray-600">
-                                <span className="font-semibold text-pink-600">${product.price.toFixed(2)}</span>
                                 <span>{product.ingredients?.slice(0, 2).join(', ')}</span>
                             </div>
                         </Link>

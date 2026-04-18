@@ -55,7 +55,7 @@ exports.getReviewsByProduct = async (req, res) => {
 
 exports.getMyReviews = async (req, res) => {
   try {
-    const reviews = await Review.find({ user: req.user._id }).populate('product', 'name price');
+    const reviews = await Review.find({ user: req.user._id }).populate('product', 'name');
     res.json({ reviews });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });

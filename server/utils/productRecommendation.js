@@ -25,8 +25,7 @@ const calculateProductScore = (userProfile, product) => {
     score += matchingConcerns.length * 2;
   }
 
-  // +1 if product benefits match user goals (if available)
-  // (This can be extended if user goals are added to profile)
+  // +1 base quality signal when product benefits are available
   if (product.benefits && product.benefits.length > 0) {
     score += 1;
   }

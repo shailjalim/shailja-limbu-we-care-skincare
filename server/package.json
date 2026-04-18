@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "test": "jest --runInBand",
     "migrate:products": "node migrateProductRecommendationFields.js",
+    "migrate:remove-product-prices": "node migrateRemoveProductPrices.js",
     "seed:quiz-config": "node seedQuizScoringConfig.js"
   },
   "keywords": [

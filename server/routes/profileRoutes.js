@@ -41,7 +41,6 @@ router.get('/me', protect, userOnly, getMyProfile);
  * @body    {string} skinType - Required. One of: oily, dry, combination, normal, sensitive
  * @body    {string[]} concerns - Optional. Array of skin concerns
  * @body    {string[]} allergies - Optional. Array of known allergies
- * @body    {string[]} goals - Optional. Array of skincare goals
  */
 router.post('/', protect, userOnly, createOrUpdateProfile);
 

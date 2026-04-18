@@ -76,7 +76,6 @@ const ProductDetail = () => {
                         </div>
                         <div className="md:w-1/2">
                             <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
-                            <p className="text-2xl font-semibold text-pink-600 mb-4">${product.price.toFixed(2)}</p>
                             <p className="text-gray-600 mb-6">{product.description}</p>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="rounded-3xl bg-pink-50 p-4">

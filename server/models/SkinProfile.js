@@ -3,7 +3,7 @@
  * 
  * Defines the schema for user skin profile documents in MongoDB.
  * Each user can have only ONE skin profile (enforced by unique user reference).
- * Stores skin type, concerns, allergies, and skincare goals.
+ * Stores skin type, concerns, allergies, sensitivity level, and routine stats.
  * 
  * @module models/SkinProfile
  */
@@ -28,7 +28,6 @@ const stringArrayValidator = {
  * - skinType: User's skin type (required, from predefined options)
  * - concerns: Array of skin concerns (e.g., acne, wrinkles, dark spots)
  * - allergies: Array of known allergies to skincare ingredients
- * - goals: Array of skincare goals the user wants to achieve
  */
 const skinProfileSchema = new mongoose.Schema(
     {
@@ -124,13 +123,6 @@ const skinProfileSchema = new mongoose.Schema(
         lastQuizDate: {
             type: Date,
             default: Date.now,
-        },
-
-        // Array of skincare goals (optional, defaults to empty array)
-        goals: {
-            type: [String],
-            default: [],
-            validate: stringArrayValidator,
         },
     },
     {

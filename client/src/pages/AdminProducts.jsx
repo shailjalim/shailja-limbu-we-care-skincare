@@ -11,7 +11,6 @@ const initialForm = {
   name: '',
   category: 'General',
   description: '',
-  price: '',
   skinType: 'normal',
   concerns: '',
   benefits: '',
@@ -57,7 +56,6 @@ const AdminProducts = () => {
       name: item.name || '',
       category: item.category || 'General',
       description: item.description || '',
-      price: item.price ?? '',
       skinType: item.skinTypes?.[0] || 'normal',
       concerns: (item.concerns || []).join(', '),
       benefits: (item.benefits || []).join(', '),
@@ -74,7 +72,6 @@ const AdminProducts = () => {
 
     const payload = {
       ...form,
-      price: Number(form.price),
       category: form.category,
       concerns: form.concerns,
       benefits: form.benefits,
@@ -125,7 +122,6 @@ const AdminProducts = () => {
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Price</th>
               <th className="px-4 py-3">Skin Type</th>
               <th className="px-4 py-3">Actions</th>
             </tr>
@@ -137,7 +133,6 @@ const AdminProducts = () => {
                   <p className="font-medium text-gray-900">{item.name}</p>
                   <p className="text-xs text-gray-500 line-clamp-2">{item.description}</p>
                 </td>
-                <td className="px-4 py-3 text-gray-700">${Number(item.price || 0).toFixed(2)}</td>
                 <td className="px-4 py-3 text-gray-700">{item.skinTypes?.[0] || 'n/a'}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
@@ -163,7 +158,6 @@ const AdminProducts = () => {
             <option value="General">General</option>
           </select>
           <textarea className="w-full rounded-xl border border-gray-300 px-4 py-3" rows={4} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
-          <input type="number" min="0" step="0.01" className="w-full rounded-xl border border-gray-300 px-4 py-3" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
           <select className="w-full rounded-xl border border-gray-300 px-4 py-3" value={form.skinType} onChange={(e) => setForm({ ...form, skinType: e.target.value })}>
             <option value="oily">Oily</option>
             <option value="dry">Dry</option>

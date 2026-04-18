@@ -410,10 +410,6 @@ const Dashboard = () => {
                                                     <p className="font-semibold text-gray-800">{profile.allergies?.length || 0}</p>
                                                     <p className="text-xs">Allergies</p>
                                                 </div>
-                                                <div>
-                                                    <p className="font-semibold text-gray-800">{profile.goals?.length || 0}</p>
-                                                    <p className="text-xs">Goals</p>
-                                                </div>
                                             </div>
                                         </div>
                                         <button 
@@ -440,7 +436,6 @@ const Dashboard = () => {
                                                     </div>
                                                     <p className="text-gray-600 text-xs mb-3 line-clamp-2">{product.description}</p>
                                                     <div className="flex items-center justify-between">
-                                                        <span className="text-lg font-bold text-pink-600">${product.price}</span>
                                                         <Link 
                                                             to={`/routines?productId=${product._id}&category=${encodeURIComponent(product.category)}`}
                                                             state={{
@@ -506,7 +501,7 @@ const Dashboard = () => {
                                         <p>You completed {profile?.routineStats?.weeklyCompleted || 0} routines this week.</p>
                                         <p>Total routines completed: {profile?.routineStats?.totalCompleted || 0}</p>
                                     </div>
-                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div className="p-4 bg-pink-50 rounded-xl text-center">
                                             <p className="text-3xl font-bold text-pink-600">{routines.length}</p>
                                             <p className="text-sm text-gray-600 mt-1">Routines Created</p>
@@ -518,10 +513,6 @@ const Dashboard = () => {
                                         <div className="p-4 bg-purple-50 rounded-xl text-center">
                                             <p className="text-3xl font-bold text-purple-600">{profile?.routineStats?.totalCompleted || 0}</p>
                                             <p className="text-sm text-gray-600 mt-1">Total Completed</p>
-                                        </div>
-                                        <div className="p-4 bg-blue-50 rounded-xl text-center">
-                                            <p className="text-3xl font-bold text-blue-600">{profile?.goals?.length || 0}</p>
-                                            <p className="text-sm text-gray-600 mt-1">Skincare Goals</p>
                                         </div>
                                     </div>
                                 </div>

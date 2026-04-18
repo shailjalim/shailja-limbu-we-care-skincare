@@ -90,6 +90,13 @@ exports.activateSubscription = async (req, res) => {
       });
     }
 
+    if (paymentMethod && String(paymentMethod).toLowerCase() !== 'esewa') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only eSewa payment method is supported',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -105,9 +112,9 @@ exports.activateSubscription = async (req, res) => {
       user: user._id,
       plan,
       status: 'active',
-      paymentMethod: paymentMethod || 'simulation',
+      paymentMethod: 'eSewa',
       amount: PLAN_AMOUNTS[plan],
-      transactionId: transactionId || `SIM-${Date.now()}`,
+      transactionId: transactionId || `ESEWA-${Date.now()}`,
       startDate,
       endDate: expiryDate,
     });

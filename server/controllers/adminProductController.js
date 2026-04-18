@@ -37,7 +37,6 @@ const mapProductPayload = (body = {}) => {
   return {
     name: body.name,
     description: body.description,
-    price: Number(body.price),
     category: normalizeCategory(body.category),
     skinTypes: explicitSkinTypes.length > 0 ? explicitSkinTypes : inferredFields.skinTypes,
     concerns: explicitConcerns.length > 0 ? explicitConcerns : inferredFields.concerns,
@@ -59,8 +58,8 @@ exports.getAdminProducts = async (req, res) => {
 exports.createAdminProduct = async (req, res) => {
   try {
     const payload = mapProductPayload(req.body);
-    if (!payload.name || !payload.description || Number.isNaN(payload.price)) {
-      return res.status(400).json({ success: false, message: 'name, description and valid price are required' });
+    if (!payload.name || !payload.description) {
+      return res.status(400).json({ success: false, message: 'name and description are required' });
     }
 
     const product = await Product.create(payload);
@@ -77,14 +76,10 @@ exports.createAdminProduct = async (req, res) => {
 exports.updateAdminProduct = async (req, res) => {
   try {
     const payload = mapProductPayload(req.body);
-    if (req.body.price !== undefined && Number.isNaN(payload.price)) {
-      return res.status(400).json({ success: false, message: 'price must be a valid number' });
-    }
 
     const updateData = {
       ...(req.body.name !== undefined ? { name: payload.name } : {}),
       ...(req.body.description !== undefined ? { description: payload.description } : {}),
-      ...(req.body.price !== undefined ? { price: payload.price } : {}),
       ...(req.body.category !== undefined ? { category: payload.category } : {}),
       ...(req.body.skinType !== undefined || req.body.skinTypes !== undefined ? { skinTypes: payload.skinTypes } : {}),
       ...(req.body.concerns !== undefined ? { concerns: payload.concerns } : {}),

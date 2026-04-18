@@ -31,7 +31,6 @@ const createOrUpdateProfile = async (req, res) => {
             skinType,
             concerns,
             allergies,
-            goals,
             sensitivityLevel,
             lifestyle,
             routineStats,
@@ -78,13 +77,6 @@ const createOrUpdateProfile = async (req, res) => {
             });
         }
 
-        if (goals !== undefined && !Array.isArray(goals)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Goals must be an array of strings',
-            });
-        }
-
         const validSunExposure = ['low', 'medium', 'high'];
         const validWaterIntake = ['low', 'adequate', 'high'];
 
@@ -126,7 +118,6 @@ const createOrUpdateProfile = async (req, res) => {
             skinType: skinType.toLowerCase(),
             concerns: concerns || [],
             allergies: allergies || [],
-            goals: goals || [],
             sensitivityLevel: sensitivityLevel ? String(sensitivityLevel).toLowerCase() : undefined,
             lifestyle: {
                 sunExposure: lifestyle?.sunExposure ? String(lifestyle.sunExposure).toLowerCase() : undefined,
@@ -148,7 +139,6 @@ const createOrUpdateProfile = async (req, res) => {
                     skinType: profileData.skinType,
                     concerns: profileData.concerns,
                     allergies: profileData.allergies,
-                    goals: profileData.goals,
                     sensitivityLevel: profileData.sensitivityLevel,
                     lifestyle: profileData.lifestyle,
                     routineStats: profileData.routineStats,
