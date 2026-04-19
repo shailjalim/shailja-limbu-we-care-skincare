@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getSkinProfile, getUser, getAllProducts, getContent, getRoutines, getSubscriptionStatus } from '../services/api';
 import { getRecommendedContent } from '../utils/contentRecommendation';
 
@@ -79,6 +79,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
+    const [greetingLabel, setGreetingLabel] = useState('Welcome back');
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [recommendedContent, setRecommendedContent] = useState([]);
     const [routines, setRoutines] = useState([]);
@@ -90,6 +91,7 @@ const Dashboard = () => {
     });
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     /**
      * Fetch user data, skin profile, products, and routines on component mount
@@ -99,6 +101,13 @@ const Dashboard = () => {
             try {
                 setLoading(true);
                 setError(null);
+
+                const greetingFromState = location.state?.greeting;
+                if (greetingFromState === 'welcome') {
+                    setGreetingLabel('Welcome');
+                } else {
+                    setGreetingLabel('Welcome back');
+                }
 
                 // Get user data from localStorage
                 const userData = getUser();
@@ -174,7 +183,7 @@ const Dashboard = () => {
         };
 
         fetchData();
-    }, []);
+    }, [location.state]);
 
     /**
      * Navigate to quiz page
@@ -227,7 +236,7 @@ const Dashboard = () => {
             <header className="bg-white border-b border-gray-100 px-4 lg:px-8 py-4">
                 <div className="max-w-7xl mx-auto">
                     <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
-                        Welcome back, <span className="text-pink-600">{user?.name || 'User'}</span>
+                        {greetingLabel}, <span className="text-pink-600">{user?.name || 'User'}</span>
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">Your personal dashboard is ready to glow.</p>
                 </div>

@@ -96,6 +96,7 @@ const Register = () => {
         setError('');
 
         try {
+            sessionStorage.setItem('dashboardGreeting', 'welcome');
             const response = await register({
                 name: formData.name,
                 email: formData.email,
@@ -105,7 +106,7 @@ const Register = () => {
 
             if (response.success) {
                 // Registration successful - redirect to dashboard
-                navigate('/dashboard');
+                navigate('/dashboard', { state: { greeting: 'welcome' } });
             }
         } catch (err) {
             // Handle error response

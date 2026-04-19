@@ -73,7 +73,7 @@ const Login = () => {
 
             if (response.success) {
                 // Login successful - redirect to dashboard
-                navigate('/dashboard');
+                navigate('/dashboard', { state: { greeting: 'welcome-back' } });
             }
         } catch (err) {
             // Handle error response
