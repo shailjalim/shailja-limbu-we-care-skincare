@@ -1,30 +1,13 @@
-/**
- * ForgotPassword Page
- * 
- * Password recovery page for users who forgot their password.
- * Sends a password reset email to the user's registered email address.
- * 
- * @module pages/ForgotPassword
- */
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { forgotPassword } from '../services/api';
 
-/**
- * Email validation regex pattern
- */
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * ForgotPassword Component
- * 
- * Handles the forgot password flow by collecting user email
- * and requesting a password reset link.
- */
-const ForgotPassword = () => {
-    // ============ STATE MANAGEMENT ============
 
+const ForgotPassword = () => {
+    
     // Form state
     const [email, setEmail] = useState('');
     

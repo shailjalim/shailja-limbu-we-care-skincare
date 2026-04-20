@@ -1,9 +1,3 @@
-/**
- * Features Page Component
- * 
- * Showcases all features of the WeCare skincare application.
- */
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
