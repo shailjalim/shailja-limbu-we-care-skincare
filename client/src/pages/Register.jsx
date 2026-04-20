@@ -1,21 +1,10 @@
-/**
- * Register Page Component
- * 
- * User registration page for WeCare.
- * Connects to backend API for user registration.
- * 
- * @module pages/Register
- */
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, isAuthenticated, getAdminStatus } from '../services/api';
 
 const Register = () => {
-    // Navigation hook for redirects
     const navigate = useNavigate();
 
-    // Form state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -24,14 +13,13 @@ const Register = () => {
         role: 'user',
     });
 
-    // UI state
+    
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [adminExists, setAdminExists] = useState(false);
 
-    // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated()) {
             navigate('/dashboard');
@@ -44,7 +32,7 @@ const Register = () => {
                 const response = await getAdminStatus();
                 setAdminExists(!!response.adminExists);
             } catch (err) {
-                // Keep admin option visible if status check fails; backend still enforces the rule.
+                
                 setAdminExists(false);
             }
         };
@@ -52,9 +40,7 @@ const Register = () => {
         fetchAdminStatus();
     }, []);
 
-    /**
-     * Handle input field changes
-     */
+    
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -63,35 +49,27 @@ const Register = () => {
         setError('');
     };
 
-    /**
-     * Handle form submission
-     * Validates inputs and calls register API
-     */
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // ============ CLIENT-SIDE VALIDATION ============
-
-        // Check password match
+        
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             return;
         }
         
-        // Check password length
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters long');
             return;
         }
 
-        // Check terms agreement
         if (!agreedToTerms) {
             setError('Please agree to the Terms of Service and Privacy Policy');
             return;
         }
 
-        // ============ API CALL ============
-
+        
         setIsLoading(true);
         setError('');
 
@@ -105,19 +83,18 @@ const Register = () => {
             });
 
             if (response.success) {
-                // Registration successful - redirect to dashboard
+                
                 navigate('/dashboard', { state: { greeting: 'welcome' } });
             }
         } catch (err) {
-            // Handle error response
+            
             setError(err.message || 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // ============ PASSWORD STRENGTH INDICATOR ============
-
+    
     const getPasswordStrength = (password) => {
         let strength = 0;
         if (password.length >= 6) strength++;
@@ -135,17 +112,16 @@ const Register = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-white flex items-center justify-center px-4 py-12">
             <div className="max-w-md w-full">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <Link to="/" className="text-4xl font-bold text-pink-600">WeCare</Link>
                     <p className="text-gray-600 mt-2">Create your account and start your skincare journey.</p>
                 </div>
 
-                {/* Register Card */}
+    
                 <div className="bg-white rounded-3xl shadow-xl p-8">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Account</h2>
 
-                    {/* Error Message */}
+                    
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
                             {error}
@@ -153,7 +129,6 @@ const Register = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Name Field */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Full Name
@@ -176,7 +151,7 @@ const Register = () => {
                             </div>
                         </div>
 
-                        {/* Email Field */}
+                        
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Email Address
@@ -199,7 +174,7 @@ const Register = () => {
                             </div>
                         </div>
 
-                        {/* Password Field */}
+                    
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Password
@@ -236,7 +211,7 @@ const Register = () => {
                                     )}
                                 </button>
                             </div>
-                            {/* Password Strength Indicator */}
+                            
                             {formData.password && (
                                 <div className="mt-2">
                                     <div className="flex gap-1">
@@ -260,7 +235,7 @@ const Register = () => {
                             )}
                         </div>
 
-                        {/* Confirm Password Field */}
+                       
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Confirm Password
@@ -289,7 +264,7 @@ const Register = () => {
                             )}
                         </div>
 
-                        {/* Terms Agreement */}
+                       
                         {!adminExists && (
                             <div className="rounded-xl border border-pink-100 bg-pink-50 p-3">
                                 <div className="flex items-start">
@@ -351,7 +326,7 @@ const Register = () => {
                         </button>
                     </form>
 
-                    {/* Sign In Link */}
+                   
                     <p className="text-center mt-8 text-gray-600">
                         Already have an account?{' '}
                         <Link to="/login" className="text-pink-600 hover:text-pink-700 font-medium">
@@ -360,7 +335,7 @@ const Register = () => {
                     </p>
                 </div>
 
-                {/* Back to Home */}
+                
                 <p className="text-center mt-6">
                     <Link to="/" className="text-gray-500 hover:text-pink-600 text-sm">
                         ← Back to Home

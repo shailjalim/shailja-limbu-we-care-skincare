@@ -1,22 +1,9 @@
-/**
- * SkinQuiz Page
- * 
- * Interactive multi-choice skin quiz for users to discover skin type and concerns.
- * Displays one question at a time and submits weighted answers to backend API.
- * 
- * @module pages/SkinQuiz
- */
-
 import React, { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { submitSkinQuiz } from '../services/api';
 import { SKIN_QUIZ_QUESTIONS } from '../data/skinQuizQuestions';
 
-/**
- * SkinQuiz Component
- * 
- * Main quiz page component that manages quiz state and submission.
- */
+
 const SkinQuiz = () => {
     const navigate = useNavigate();
     const totalQuestions = SKIN_QUIZ_QUESTIONS.length;

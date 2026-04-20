@@ -1,23 +1,15 @@
-/**
- * Home Page Component
- * 
- * Landing page for WeCare skincare application.
- * Includes Hero, Features, and Testimonials sections.
- */
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
     return (
         <div className="bg-white">
-            {/* HERO SECTION */}
             <section className="w-full px-8 lg:px-20 py-14">
                 <div className="grid md:grid-cols-2 gap-10 items-center">
                     
-                    {/* LEFT SIDE - Content */}
+                    
                     <div>
-                        {/* Small Tag */}
+                       
                         <div className="inline-flex items-center bg-pink-50 text-pink-600 px-4 py-2 rounded-full text-sm mb-4">
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
@@ -36,19 +28,19 @@ const Home = () => {
                             Your Personalized Skincare Journey
                         </div>
 
-                        {/* Main Heading */}
+                       
                         <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-gray-800">
                             Understand Your Skin. <br />
                             <span className="text-pink-600">Build Your Perfect Routine.</span>
                         </h1>
 
-                        {/* Description */}
+                        2
                         <p className="mt-5 text-gray-600 leading-relaxed text-lg">
                             Take our personalized quiz to discover skincare products and routines tailored
                             specifically for your unique skin needs.
                         </p>
 
-                        {/* CTA Buttons */}
+                       
                         <div className="flex flex-wrap gap-4 mt-8">
                             <Link 
                                 to="/register"

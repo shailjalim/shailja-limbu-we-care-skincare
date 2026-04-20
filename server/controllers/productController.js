@@ -5,7 +5,6 @@ const {
   getDetailedRecommendations,
 } = require('../utils/productRecommendation');
 
-// Get all products with optional search/filter
 exports.getProducts = async (req, res) => {
   try {
     const { search, ingredient, category, skinType, concern } = req.query;
@@ -41,7 +40,7 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// Get single product by ID
+
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -52,7 +51,7 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// Admin: Add new product
+
 exports.createProduct = async (req, res) => {
   try {
     const product = new Product(req.body);
@@ -63,7 +62,7 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// Admin: Update product
+
 exports.updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -74,7 +73,7 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// Admin: Delete product
+
 exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -85,14 +84,14 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
-// Get recommended products for authenticated user
+
 exports.getRecommendedProducts = async (req, res) => {
   try {
-    // Get user ID from auth token (from authMiddleware)
+    
     const userId = req.user.id;
     const { limit = 5, groupByCategory = false, detailed = false } = req.query;
 
-    // Fetch user's skin profile
+    
     const userProfile = await SkinProfile.findOne({ user: userId });
     if (!userProfile) {
       return res.status(404).json({
@@ -100,10 +99,9 @@ exports.getRecommendedProducts = async (req, res) => {
       });
     }
 
-    // Fetch all products
+    
     const allProducts = await Product.find();
 
-    // Get recommendations using appropriate function
     let recommendations;
     if (detailed === 'true') {
       recommendations = getDetailedRecommendations(

@@ -1,23 +1,9 @@
-/**
- * Updated Dashboard Page
- * 
- * Comprehensive dashboard for authenticated users with:
- * - Skin profile summary
- * - Quick actions
- * - Recommended products based on skin type
- * - Activity tracking
- * - Notifications
- * - Skin concerns and allergies
- */
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getSkinProfile, getUser, getAllProducts, getContent, getRoutines, getSubscriptionStatus } from '../services/api';
 import { getRecommendedContent } from '../utils/contentRecommendation';
 
-/**
- * Skin type display configuration
- */
+
 const SKIN_TYPE_CONFIG = {
     oily: { label: 'Oily', color: 'bg-yellow-100 text-yellow-800', icon: '💧' },
     dry: { label: 'Dry', color: 'bg-orange-100 text-orange-800', icon: '🏜️' },
@@ -26,10 +12,7 @@ const SKIN_TYPE_CONFIG = {
     sensitive: { label: 'Sensitive', color: 'bg-red-100 text-red-800', icon: '🌸' },
 };
 
-/**
- * Get recommended products based on skin type, concerns, and allergies
- * Filters products that match skin type benefits and excludes allergenic ingredients
- */
+
 const getRecommendedProductsForSkin = (products, skinType, concerns = [], allergies = []) => {
     if (!products || !Array.isArray(products)) return [];
 
@@ -43,10 +26,9 @@ const getRecommendedProductsForSkin = (products, skinType, concerns = [], allerg
 
     const targetBenefits = benefitMap[skinType] || ['hydration', 'brightening'];
 
-    // Score products based on benefit matches and filter by allergies
+    
     const scored = products
         .filter((product) => {
-            // Exclude products with allergenic ingredients
             if (allergies && allergies.length > 0) {
                 const productIngredients = (product.ingredients || []).map((i) => i.toLowerCase());
                 const hasAllergen = allergies.some((allergy) =>
@@ -57,7 +39,6 @@ const getRecommendedProductsForSkin = (products, skinType, concerns = [], allerg
             return true;
         })
         .map((product) => {
-            // Calculate benefit match score
             const benefitMatches = (product.benefits || []).filter((b) =>
                 targetBenefits.includes(b)
             ).length;
@@ -66,15 +47,12 @@ const getRecommendedProductsForSkin = (products, skinType, concerns = [], allerg
         .filter((product) => product.score > 0)
         .sort((a, b) => b.score - a.score);
 
-    // Return top 5 products
+    
     return scored.slice(0, 5);
 };
 
-/**
- * Dashboard Component
- */
+
 const Dashboard = () => {
-    // State management
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -93,9 +71,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    /**
-     * Fetch user data, skin profile, products, and routines on component mount
-     */
+    
     useEffect(() => {
         const fetchData = async () => {
             try {

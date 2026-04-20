@@ -148,13 +148,7 @@ const getInvalidQuestionAnswers = (answers, questions) => {
     return invalid;
 };
 
-/**
- * @desc    Submit Skin Quiz and calculate profile attributes
- * @route   POST /api/quiz
- * @access  Private (requires authentication)
- * 
- * @body    {Object} answers - Quiz answers as option IDs keyed by question ID
- */
+
 const submitQuiz = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -243,7 +237,6 @@ const submitQuiz = async (req, res) => {
     }
 };
 
-// Export controller functions
 module.exports = {
     submitQuiz,
 };

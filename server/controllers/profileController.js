@@ -1,26 +1,5 @@
-/**
- * Profile Controller
- * 
- * Handles all skin profile-related operations.
- * Provides endpoints for creating, updating, and retrieving user skin profiles.
- * 
- * @module controllers/profileController
- */
-
 const SkinProfile = require('../models/SkinProfile');
 
-/**
- * @desc    Create or Update Skin Profile
- * @route   POST /api/profile
- * @access  Private (requires authentication)
- * 
- * Logic:
- * - Extracts user ID from authenticated request (req.user._id)
- * - Checks if a profile already exists for this user
- * - If exists: Updates the existing profile with new data
- * - If not exists: Creates a new profile for the user
- * - Returns the created/updated profile
- */
 const createOrUpdateProfile = async (req, res) => {
     try {
         // Extract user ID from authenticated request
@@ -193,17 +172,7 @@ const createOrUpdateProfile = async (req, res) => {
     }
 };
 
-/**
- * @desc    Get Current User's Skin Profile
- * @route   GET /api/profile/me
- * @access  Private (requires authentication)
- * 
- * Logic:
- * - Extracts user ID from authenticated request (req.user._id)
- * - Queries database for the user's skin profile
- * - Returns 404 if no profile found
- * - Returns the profile if found
- */
+
 const getMyProfile = async (req, res) => {
     try {
         // Extract user ID from authenticated request

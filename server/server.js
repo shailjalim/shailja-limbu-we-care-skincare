@@ -8,7 +8,7 @@
  */
 
 // Load environment variables from .env file
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 // Import required packages
 const express = require('express');

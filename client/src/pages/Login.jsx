@@ -1,42 +1,29 @@
-/**
- * Login Page Component
- * 
- * User authentication login page for WeCare.
- * Connects to backend API for user authentication.
- * 
- * @module pages/Login
- */
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, isAuthenticated } from '../services/api';
 
 const Login = () => {
-    // Navigation hook for redirects
     const navigate = useNavigate();
 
-    // Form state
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
 
-    // UI state
+   
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
 
-    // Redirect if already authenticated
+    
     useEffect(() => {
         if (isAuthenticated()) {
             navigate('/dashboard');
         }
     }, [navigate]);
 
-    /**
-     * Handle input field changes
-     */
+    
     const handleChange = (e) => {
         const fieldName = e.target.name === 'loginEmail' ? 'email' : e.target.name === 'loginPassword' ? 'password' : e.target.name;
         setFormData({
@@ -46,22 +33,17 @@ const Login = () => {
         setError('');
     };
 
-    /**
-     * Handle form submission
-     * Validates inputs and calls login API
-     */
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // ============ CLIENT-SIDE VALIDATION ============
-
+        
         if (!formData.email || !formData.password) {
             setError('Please fill in all fields');
             return;
         }
 
-        // ============ API CALL ============
-
+       
         setIsLoading(true);
         setError('');
 
@@ -72,11 +54,10 @@ const Login = () => {
             });
 
             if (response.success) {
-                // Login successful - redirect to dashboard
                 navigate('/dashboard', { state: { greeting: 'welcome-back' } });
             }
         } catch (err) {
-            // Handle error response
+            
             setError(err.message || 'Invalid email or password');
         } finally {
             setIsLoading(false);
@@ -86,17 +67,17 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-white flex items-center justify-center px-4 py-12">
             <div className="max-w-md w-full">
-                {/* Logo */}
+                
                 <div className="text-center mb-8">
                     <Link to="/" className="text-4xl font-bold text-pink-600">WeCare</Link>
                     <p className="text-gray-600 mt-2">Welcome back! Please sign in to continue.</p>
                 </div>
 
-                {/* Login Card */}
+        
                 <div className="bg-white rounded-3xl shadow-xl p-8">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Sign In</h2>
 
-                    {/* Error Message */}
+                    
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
                             {error}
@@ -104,7 +85,6 @@ const Login = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
-                        {/* Email Field */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Email Address
@@ -130,7 +110,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Password Field */}
+                        
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Password
@@ -170,7 +150,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Remember Me & Forgot Password */}
+                       
                         <div className="flex items-center justify-between">
                             <label className="flex items-center cursor-pointer">
                                 <input 
@@ -186,7 +166,6 @@ const Login = () => {
                             </Link>
                         </div>
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -206,9 +185,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    {/* Social login removed as requested */}
-
-                    {/* Sign Up Link */}
+                   
                     <p className="text-center mt-8 text-gray-600">
                         Don't have an account?{' '}
                         <Link to="/register" className="text-pink-600 hover:text-pink-700 font-medium">
@@ -217,7 +194,7 @@ const Login = () => {
                     </p>
                 </div>
 
-                {/* Back to Home */}
+            
                 <p className="text-center mt-6">
                     <Link to="/" className="text-gray-500 hover:text-pink-600 text-sm">
                         ← Back to Home

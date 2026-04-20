@@ -1,9 +1,3 @@
-/**
- * Community Page Component
- * 
- * Community hub for WeCare users to connect and share.
- */
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -41,7 +35,6 @@ const Community = () => {
 
     return (
         <div className="bg-white min-h-screen">
-            {/* Hero Section */}
             <section className="w-full px-8 lg:px-20 py-16 bg-gradient-to-br from-pink-50 to-white">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
