@@ -1,12 +1,3 @@
-/**
- * Authentication Controller
- * 
- * Handles user registration and login operations.
- * Generates JWT tokens for authenticated sessions.
- * 
- * @module controllers/authController
- */
-
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -37,30 +28,11 @@ const deleteLocalUpload = (relativePath) => {
         console.warn('Failed to remove local upload:', error.message);
     }
 };
-
-/**
- * Generate JWT Token
- * 
- * Creates a signed JWT token for user authentication.
- * 
- * @param {Object} user - User document/object with id and role
- * @returns {string} - Signed JWT token
- */
 const generateToken = (user) => {
     return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
         expiresIn: '7d',
     });
 };
-
-/**
- * Format User Response
- * 
- * Formats the user data and token for API response.
- * 
- * @param {Object} user - User document
- * @param {string} token - JWT token
- * @returns {Object} - Formatted response object
- */
 const formatUserResponse = (user, token) => {
     return {
         _id: user._id,
@@ -243,8 +215,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // ============ GENERATE TOKEN & RESPOND ============
-
+    
         const token = generateToken(user);
 
         res.status(200).json({

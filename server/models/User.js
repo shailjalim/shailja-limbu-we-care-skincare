@@ -1,25 +1,7 @@
-/**
- * User Model
- * 
- * Defines the schema for user documents in MongoDB.
- * Includes password hashing and comparison methods.
- * 
- * @module models/User
- */
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-/**
- * User Schema Definition
- * 
- * Fields:
- * - name: User's full name
- * - email: Unique email address (stored in lowercase)
- * - password: Hashed password (minimum 6 characters)
- * - role: User role for authorization (default: "user")
- */
 const userSchema = new mongoose.Schema(
     {
         name: {
@@ -43,7 +25,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please provide a password'],
             minlength: [6, 'Password must be at least 6 characters'],
-            select: false, // Don't include password in queries by default
+            select: false,
         },
         role: {
             type: String,

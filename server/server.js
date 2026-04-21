@@ -1,13 +1,3 @@
-/**
- * Main Server Entry Point
- * 
- * This file initializes the Express server, connects to MongoDB,
- * and sets up all middleware and routes.
- * 
- * @module server
- */
-
-// Load environment variables from .env file
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 // Import required packages
@@ -37,10 +27,10 @@ const adminUserRoutes = require('./routes/adminUserRoutes');
 const adminArticleRoutes = require('./routes/adminArticleRoutes');
 const adminConsultationRoutes = require('./routes/adminConsultationRoutes');
 
-// Initialize Express application
+
 const app = express();
 
-// Define the port (from .env or default to 5000)
+
 const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === 'production';
 const configuredOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
@@ -52,16 +42,8 @@ const allowedOrigins = isProduction
     ? configuredOrigins
     : Array.from(new Set([...defaultDevOrigins, ...configuredOrigins]));
 
-// ================== MIDDLEWARE ==================
-
-/**
- * CORS Middleware
- * Enables Cross-Origin Resource Sharing
- * Allows frontend to communicate with backend
- */
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow non-browser or same-origin requests without Origin header.
         if (!origin) {
             return callback(null, true);
         }
@@ -77,51 +59,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-/**
- * JSON Body Parser
- * Parses incoming JSON request bodies
- * Makes data available in req.body
- */
 app.use(express.json());
-
-/**
- * URL-Encoded Body Parser
- * Parses incoming URL-encoded request bodies
- * Useful for form submissions
- */
 app.use(express.urlencoded({ extended: true }));
-
-// Serve uploaded consultation images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// ================== ROUTES ==================
-
-/**
- * Authentication Routes
- * Base path: /api/auth
- * Handles user registration, login, and profile
- */
 app.use('/api/auth', authRoutes);
-
-/**
- * Skin Profile Routes
- * Base path: /api/profile
- * Handles user skin profile CRUD operations
- */
 app.use('/api/profile', profileRoutes);
-
-/**
- * Skin Quiz Routes
- * Base path: /api/quiz
- * Handles skin type quiz submission and calculation
- */
 app.use('/api/quiz', quizRoutes);
-
-/**
- * Product Routes
- * Base path: /api/products
- * Handles product catalog CRUD and queries
- */
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/routines', routineRoutes);
@@ -131,31 +74,12 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/content', contentRoutes);
-
-/**
- * Admin Routes
- * Base path: /api/admin
- * Handles admin dashboard and user management
- */
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/articles', adminArticleRoutes);
 app.use('/api/admin/consultations', adminConsultationRoutes);
-
-/**
- * Test Routes
- * Base path: /api
- * Used to verify backend is running correctly
- */
 app.use('/api', testRoutes);
-
-// ================== ROOT ROUTE ==================
-
-/**
- * Root endpoint
- * Simple welcome message to verify server is running
- */
 app.get('/', (req, res) => {
     res.json({
         message: 'Welcome to We Care API',
@@ -182,12 +106,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// ================== ERROR HANDLING ==================
 
-/**
- * 404 Handler
- * Catches requests to undefined routes
- */
 app.use((req, res, next) => {
     res.status(404).json({
         success: false,
@@ -195,10 +114,7 @@ app.use((req, res, next) => {
     });
 });
 
-/**
- * Global Error Handler
- * Catches all unhandled errors
- */
+
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
     res.status(err.statusCode || 500).json({
@@ -208,19 +124,12 @@ app.use((err, req, res, next) => {
     });
 });
 
-// ================== SERVER STARTUP ==================
-
-/**
- * Start the server
- * First attempts MongoDB connection, then starts listening on the specified port
- * Server will run even if MongoDB connection fails (for testing purposes)
- */
 const startServer = async () => {
     try {
-        // Attempt to connect to MongoDB (non-blocking)
+        
         const dbConnected = await connectDB();
 
-        // Start listening for requests
+        
         app.listen(PORT, () => {
             console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
             console.log(`📡 API available at http://localhost:${PORT}/api`);
@@ -236,7 +145,6 @@ const startServer = async () => {
     }
 };
 
-// Call the startup function when executed directly, but allow importing for tests
 if (require.main === module) {
     startServer();
 }

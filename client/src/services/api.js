@@ -1,32 +1,11 @@
-/**
- * API Service
- * 
- * Centralized API client for all backend communications.
- * Handles authentication, request/response interceptors, and API calls.
- * 
- * @module services/api
- */
-
 import axios from 'axios';
-
-// ================== CONFIGURATION ==================
-
-/**
- * Base URL for the API
- * In development: Uses proxy from package.json (http://localhost:5000)
- * In production: Set REACT_APP_API_URL environment variable
- */
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
-
-/**
- * Local Storage Keys
- */
 const TOKEN_KEY = 'wecare_token';
 const USER_KEY = 'wecare_user';
 const LEGACY_TOKEN_KEY = 'authToken';
 const LEGACY_USER_KEY = 'authUser';
 
-// Remove legacy persisted auth so restarting the app returns to the landing page.
+
 localStorage.removeItem(TOKEN_KEY);
 localStorage.removeItem(USER_KEY);
 localStorage.removeItem(LEGACY_TOKEN_KEY);

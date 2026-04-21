@@ -64,13 +64,12 @@ const getRecommendedProducts = (userProfile, allProducts, options = {}) => {
   if (!userProfile || !allProducts || !Array.isArray(allProducts)) {
     return [];
   }
-
-  // Step 1: Filter by skinType
+  
   let filtered = allProducts.filter(product =>
     product.skinTypes && product.skinTypes.includes(userProfile.skinType)
   );
 
-  // Step 2: Match concerns (keep products with at least one matching concern)
+ 
   if (userProfile.concerns && userProfile.concerns.length > 0) {
     filtered = filtered.filter(product =>
       product.concerns &&
@@ -78,7 +77,7 @@ const getRecommendedProducts = (userProfile, allProducts, options = {}) => {
     );
   }
 
-  // Step 3: Exclude allergies (VERY IMPORTANT)
+
   filtered = filtered.filter(product =>
     !containsAllergens(product.ingredients, userProfile.allergies)
   );
