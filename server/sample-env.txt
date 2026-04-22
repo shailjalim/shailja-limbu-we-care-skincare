@@ -45,7 +45,15 @@ EMAIL_FROM_NAME=We Care Skincare
 EMAIL_ALLOW_SELF_SIGNED=false
 
 # Frontend URL used in email links
+# Example (production): https://your-app.vercel.app
 FRONTEND_URL=http://localhost:3000
+
+# Allowed browser origins for CORS (comma-separated)
+# Production example:
+# CORS_ORIGINS=https://your-app.vercel.app,https://*.vercel.app
+# Keep localhost entries only for local development.
+# CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 
 # eSewa Sandbox (v2)
 ESEWA_MERCHANT_ID=EPAYTEST

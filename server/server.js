@@ -33,14 +33,34 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === 'production';
+const normalizeOrigin = (origin = '') => origin.trim().replace(/\/$/, '');
 const configuredOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
 const defaultDevOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 const allowedOrigins = isProduction
     ? configuredOrigins
     : Array.from(new Set([...defaultDevOrigins, ...configuredOrigins]));
+
+const wildcardToRegex = (pattern) => {
+    const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+    return new RegExp(`^${escaped}$`);
+};
+
+const wildcardOriginRegexes = allowedOrigins
+    .filter((origin) => origin.includes('*'))
+    .map((pattern) => wildcardToRegex(pattern));
+
+const isOriginAllowed = (origin) => {
+    const normalizedOrigin = normalizeOrigin(origin);
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
+        return true;
+    }
+
+    return wildcardOriginRegexes.some((regex) => regex.test(normalizedOrigin));
+};
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -48,7 +68,7 @@ app.use(cors({
             return callback(null, true);
         }
 
-        if (allowedOrigins.includes(origin)) {
+        if (isOriginAllowed(origin)) {
             return callback(null, true);
         }
 
